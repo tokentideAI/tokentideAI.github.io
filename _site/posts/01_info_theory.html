@@ -25,7 +25,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -352,7 +371,7 @@ window.Quarto = {
 
 <section id="self-information" class="level3">
 <h3 class="anchored" data-anchor-id="self-information">Self-Information</h3>
-<p>Information theory [1] provides a rigorous mathematical framework for quantifying “information” and “uncertainty.”</p>
+<p>Information theory <span class="citation" data-cites="shannon1948mathematical">(<a href="#ref-shannon1948mathematical" role="doc-biblioref">Shannon 1948</a>)</span> provides a rigorous mathematical framework for quantifying “information” and “uncertainty.”</p>
 <p>Every event carries a certain amount of information. For a random event, its information content can be intuitively understood as the “degree of surprise”: the lower the prior probability of an event, the more information it conveys when it actually occurs. Take weather as an example: * “It rained yesterday” is an established fact with zero surprise, so it contains zero information. * However, “it will rain tomorrow” remains uncertain, so when it happens, it carries actual information.</p>
 <p>Imagine you are hiking deep in the mountains with absolutely no cell phone signal. You know nothing about tomorrow’s cloud cover, humidity, atmospheric pressure, or any other physical conditions. In such a state of extreme cognitive deprivation, the most conservative inference you can make, is that that the probabilities of tomorrow being sunny, cloudy, or rainy are evenly split at 1/3 each, based on the principle of symmetry. This reflects a severe lack of knowledge regarding the weather system’s underlying laws—to you, the system’s <strong>uncertainty is immense</strong>.</p>
 <p>In contrast, if you check an authoritative weather forecast today and learn that the probability of a sunny day tomorrow is 0.99. Where does such high certainty come from? In fact, a massive amount of information has already been injected into the forecasting system in advance. Meteorologists have digested the original uncertainty using satellite images, historical weather models, and supercomputer simulations. Achieving such high certainty means that, during this prediction process, physical determinism has overwhelmingly outweighed randomness. From this we can draw a rather philosophical conclusion:</p>
@@ -403,7 +422,7 @@ H(p) = -\sum_{x} p(x) \log p(x) = -(0.1\ln0.1 + 0.3\ln0.3 + 0.6\ln0.6) \approx 0
 </section>
 <section id="kl-divergence" class="level3">
 <h3 class="anchored" data-anchor-id="kl-divergence">KL Divergence</h3>
-<p>In the weather prediction example above, a good prediction model (Model A) is clearly superior to a poor one (Model B). But what if we want to further quantify exactly how much extra information cost (i.e., cognitive bias or prediction error) we paid because the predicted distribution <span class="math inline">\(q\)</span> is inaccurate compared to the ideal state <span class="math inline">\(p\)</span>? This is exactly what KL Divergence answers [2].</p>
+<p>In the weather prediction example above, a good prediction model (Model A) is clearly superior to a poor one (Model B). But what if we want to further quantify exactly how much extra information cost (i.e., cognitive bias or prediction error) we paid because the predicted distribution <span class="math inline">\(q\)</span> is inaccurate compared to the ideal state <span class="math inline">\(p\)</span>? This is exactly what KL Divergence answers <span class="citation" data-cites="kullback1951information">(<a href="#ref-kullback1951information" role="doc-biblioref">Kullback and Leibler 1951</a>)</span>.</p>
 <p>In information theory, there is a classic information cost decomposition:</p>
 <p><span class="math display">\[
 \underbrace{H(p, q)}_{\text{Total predictive cost}} = \underbrace{H(p)}_{\text{Inherent randomness (minimum possible cost)}} + \underbrace{D_{\mathrm{KL}}(p \| q)}_{\text{Extra cost due to model inaccuracy}}
@@ -446,7 +465,7 @@ D_{\mathrm{KL}}(p \| q) = H(p, q) - H(p) = \sum_{i=1}^{n} p(x_i) \log\left(\frac
 \mathcal{L}_{\mathrm{CE}} = H(P, Q) = -\sum_{y} P(y|x) \log Q(y|x) = -\log Q(y^*|x).
 \]</span></p>
 <p>Because the inherent entropy <span class="math inline">\(H(P) = 0\)</span>, minimizing the cross-entropy is mathematically equivalent to minimizing the KL divergence <span class="math inline">\(D_{\mathrm{KL}}(P \parallel Q)\)</span>—essentially forcing the model’s predicted distribution <span class="math inline">\(Q\)</span> to map perfectly to the true distribution <span class="math inline">\(P\)</span>.</p>
-<p><strong>Generative Models:</strong> In generative models like Variational Autoencoders (VAEs) [3], KL divergence acts directly as an optimization objective to regularize the latent variable distribution. VAEs are trained by maximizing the Evidence Lower Bound (ELBO), formulated as: <span class="math display">\[
+<p><strong>Generative Models:</strong> In generative models like Variational Autoencoders (VAEs) <span class="citation" data-cites="kingma2013auto">(<a href="#ref-kingma2013auto" role="doc-biblioref">Kingma and Welling 2013</a>)</span>, KL divergence acts directly as an optimization objective to regularize the latent variable distribution. VAEs are trained by maximizing the Evidence Lower Bound (ELBO), formulated as: <span class="math display">\[
 \mathrm{ELBO} = \mathbb{E}_{z \sim Q_\phi(z|x)}[\log P_\theta(x|z)] - \beta \cdot D_{\mathrm{KL}}(Q_\phi(z|x) \| P(z)).
 \]</span> The corresponding minimization loss is (_{} = -).</p>
 <p>To reframe this as a minimization problem, the loss function becomes <span class="math inline">\(\mathcal{L}_{\mathrm{VAE}} = -\mathrm{ELBO}\)</span>, which balances two critical components:</p>
@@ -454,7 +473,7 @@ D_{\mathrm{KL}}(p \| q) = H(p, q) - H(p) = \sum_{i=1}^{n} p(x_i) \log\left(\frac
 <li>The Reconstruction Term: <span class="math inline">\(\mathbb{E}[\log P_\theta(x|z)]\)</span> ensures the decoder can accurately reconstruct the real data <span class="math inline">\(x\)</span> from the latent variable <span class="math inline">\(z\)</span> (typically measured via mean squared error or cross-entropy).</li>
 <li>The Regularization Term: <span class="math inline">\(D_{\mathrm{KL}}(Q_\phi(z|x) \parallel P(z))\)</span> forces the encoder’s output posterior distribution <span class="math inline">\(Q_\phi(z|x)\)</span> to approximate a defined prior <span class="math inline">\(P(z)\)</span> (such as a standard normal distribution <span class="math inline">\(\mathcal{N}(0, I)\)</span>).</li>
 </ul>
-<p><strong>Knowledge Distillation: </strong> Knowledge distillation aims to transfer the rich representations embedded in a large “teacher model” (such as DeepSeek, GPT, or Gemini) into a lightweight “student model.” To ensure the student learns not only the hard labels (0/1) but also the nuanced inter-class similarities discovered by the teacher, we introduce KL divergence to align their soft labels:</p>
+<p><strong>Knowledge Distillation: </strong> Knowledge distillation<span class="citation" data-cites="hinton2015distilling">(<a href="#ref-hinton2015distilling" role="doc-biblioref">Hinton et al. 2015</a>)</span> aims to transfer the rich representations embedded in a large “teacher model” (such as DeepSeek, GPT, or Gemini) into a lightweight “student model.” To ensure the student learns not only the hard labels (0/1) but also the nuanced inter-class similarities discovered by the teacher, we introduce KL divergence to align their soft labels:</p>
 <p><span class="math display">\[
 \mathcal{L}_{\mathrm{KD}} = \alpha \cdot \mathcal{L}_{\mathrm{CE}}(y, q_s) + (1-\alpha) \cdot T^2 \cdot D_{\mathrm{KL}}(p_t \| p_s),
 \]</span> where the teacher’s and student’s smoothed probabilities at temperature <span class="math inline">\(T\)</span> are defined as: <span class="math display">\[
@@ -463,7 +482,7 @@ p_t = \mathrm{softmax}\!\left(\frac{z_t}{T}\right), \quad p_s = \mathrm{softmax}
 <p>A higher temperature <span class="math inline">\(T\)</span> yields a smoother distribution that reveals hidden inter-class relationships, while multiplying the term by <span class="math inline">\(T^2\)</span> preserves the original gradient scale of the soft-label loss. By minimizing <span class="math inline">\(D_{\mathrm{KL}}(p_t \parallel p_s)\)</span>, the student model is forced to replicate the teacher’s reasoning logic and predictive confidence. This yields a significantly stronger generalization capability than could be achieved by fitting hard labels alone.</p>
 <p><strong>Reinforcement Learning: </strong> In reinforcement learning (RL), KL divergence and entropy play distinct but equally critical roles in stabilizing training and promoting exploration.</p>
 <ul>
-<li><p><strong>KL divergence for constraining policy updates:</strong> In the clipped version of Proximal Policy Optimization (PPO) [4], the objective function is: <span class="math display">\[
+<li><p><strong>KL divergence for constraining policy updates:</strong> In the clipped version of Proximal Policy Optimization (PPO) <span class="citation" data-cites="schulman2017proximal">(<a href="#ref-schulman2017proximal" role="doc-biblioref">Schulman et al. 2017</a>)</span>, the objective function is: <span class="math display">\[
   \mathcal{L}^{\mathrm{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ \min\left( r_t(\theta) \hat{A}_t,\; \mathrm{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_t \right) \right],
   \]</span> where <span class="math inline">\(r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{\mathrm{old}}}(a_t|s_t)}\)</span>. By restricting the probability ratio <span class="math inline">\(r_t(\theta)\)</span> to the interval <span class="math inline">\([1-\epsilon, 1+\epsilon]\)</span>, the clipping operation implicitly bounds the KL divergence <span class="math inline">\(D_{\mathrm{KL}}(\pi_{\theta_{\mathrm{old}}} \parallel \pi_\theta)\)</span>. This prevents drastic, destructive policy updates and ensures monotonic training stability.</p></li>
 <li><p><strong>Entropy for encouraging exploration:</strong> To prevent a policy from prematurely converging to a deterministic, suboptimal solution, many policy gradient methods incorporate an entropy regularization term into the loss:</p>
@@ -471,67 +490,87 @@ p_t = \mathrm{softmax}\!\left(\frac{z_t}{T}\right), \quad p_s = \mathrm{softmax}
   \mathcal{L} = \mathbb{E}_t\left[ \log \pi_\theta(a_t|s_t) \hat{A}_t \right] + \beta \cdot H(\pi_\theta(\cdot|s_t)),
 \]</span></p></li>
 </ul>
-<p>Soft Actor-Critic (SAC) [6] advances this concept by establishing a formal “maximum entropy” RL framework. SAC maximizes a weighted sum of the expected return and the policy’s entropy by optimizing the following objective:<span class="math display">\[J(\pi) = \sum_t \mathbb{E}_{(s_t, a_t)} \left[ r(s_t, a_t) + \alpha H(\pi(\cdot|s_t)) \right].\]</span>This formulation structurally guarantees a superior balance between exploration and exploitation, leading to more robust policies with enhanced generalization across varied environments.</p>
+<p>Soft Actor-Critic (SAC) <span class="citation" data-cites="haarnoja2018soft">(<a href="#ref-haarnoja2018soft" role="doc-biblioref">Haarnoja et al. 2018</a>)</span> advances this concept by establishing a formal “maximum entropy” RL framework. SAC maximizes a weighted sum of the expected return and the policy’s entropy by optimizing the following objective:<span class="math display">\[J(\pi) = \sum_t \mathbb{E}_{(s_t, a_t)} \left[ r(s_t, a_t) + \alpha H(\pi(\cdot|s_t)) \right].\]</span>This formulation structurally guarantees a superior balance between exploration and exploitation, leading to more robust policies with enhanced generalization across varied environments.</p>
 </section>
-<section id="from-thermodynamic-entropy-to-information-entropy" class="level3">
-<h3 class="anchored" data-anchor-id="from-thermodynamic-entropy-to-information-entropy">From Thermodynamic Entropy to Information Entropy</h3>
-<p>Before concluding our story, let us revisit the origins of entropy and KL divergence in their birthplace: thermodynamics and statistical physics.</p>
-<p><strong>Physical picture: particles and energy levels</strong> Imagine randomly throwing (N) small stones (analogous to independent particles in physics) into (M) buckets (analogous to energy levels). The bucket each stone lands in is random, and ultimately we observe a probability distribution ({n_i}), where (n_i) is the number of stones in bucket (i). This process naturally corresponds to a probability distribution ({p_i = n_i / N}).</p>
-<p>Suppose we only care about the final macroscopic state, i.e., how many stones end up in each bucket. We describe the macrostate by a vector ( = {n_1, n_2, , n_M}) with the constraint (n_i = N). How many microstate arrangements lead to a given macrostate ()?</p>
-<p>The first stone has (N) possible placements, the second (N-1), and so on, giving (N!) total permutations. However, since we do not care about the ordering of stones within the same bucket, we must divide by the factorial of the occupation number of each bucket. Thus, the number of microstates (the multinomial coefficient) behind this macrostate is:</p>
-<p>[ W = ]</p>
-<p>In physics, (W) is called the multiplicity. Boltzmann pointed out that the physical entropy of a system is proportional to the logarithm of the multiplicity. Here, we can define the physical entropy per particle as:</p>
-<p>[ H = W ]</p>
+<section id="the-physical-roots-thermodynamics-and-statistical-mechanics" class="level3">
+<h3 class="anchored" data-anchor-id="the-physical-roots-thermodynamics-and-statistical-mechanics">The Physical Roots: Thermodynamics and Statistical Mechanics</h3>
+<p>Before wrapping up, let us revisit the origins of entropy and KL divergence in their birthplace: thermodynamics and statistical physics.</p>
+<p><strong>The Physical picture: particles and energy levels: </strong> Imagine randomly throwing <span class="math inline">\(N\)</span> small stones (analogous to independent particles) into <span class="math inline">\(M\)</span> buckets (analogous to energy levels). The bucket each stone lands in is random, ultimately yielding an observed distribution where <span class="math inline">\(n_i\)</span> is the number of stones in bucket <span class="math inline">\(i\)</span>. This process naturally generates a probability distribution where the proportion of stones in each bucket is <span class="math inline">\(p_i = n_i / N\)</span>.</p>
+<p>Suppose we only care about the final macrostate—how many stones end up in each bucket, regardless of which specific stone went where. We describe this macrostate using a vector <span class="math inline">\(\mathbf{n} = \{n_1, n_2, \dots, n_M\}\)</span> under the strict constraint that <span class="math inline">\(\sum n_i = N\)</span>. The question then becomes: How many microscopic arrangements (microstates) lead to this exact macrostate?</p>
+<p>The first stone has <span class="math inline">\(N\)</span> possible placements, the second <span class="math inline">\(N-1\)</span>, and so on, giving <span class="math inline">\(N!\)</span> total permutations. However, because we do not care about the ordering of stones within the same bucket, we must divide out the redundant permutations by taking the factorial of each bucket’s occupation number. This gives us the total number of microstates (the multinomial coefficient) behind the macrostate:</p>
+<p><span class="math display">\[W = \frac{N!}{\prod_{i=1}^{M} n_i!}\]</span></p>
+<p>In physics, <span class="math inline">\(W\)</span> is known as the multiplicity. Ludwig Boltzmann famously proposed that the physical entropy of a system is proportional to the logarithm of its multiplicity. Therefore, we can define the physical entropy per particle as:</p>
 <p>If we further assume that each bucket has an equal prior probability (i.e., a uniform distribution with probability (1/M)), then the total probability of observing the macrostate () follows a standard multinomial distribution:</p>
-<p>[ P(n_1, n_2, , n_M) = _{i=1}^{M} ()^{n_i} = W ()^N ]</p>
-<p>Taking the logarithm of the probability and dividing by (N), we obtain:</p>
-<p>[ P = W + !() ]</p>
-<p>Since the second term is a fixed constant, finding the macrostate with the largest multiplicity (W) is physically equivalent to finding the state with the highest probability of occurring.</p>
-<p><strong>Uniform distribution and Shannon entropy</strong> Now consider the limit (N ) while the bucket ratios (p_i = n_i/N) are held fixed. Expanding (H):</p>
-<p>[ H = (N!) - _{i=1}^{M} (n_i!) ]</p>
-<p>Applying Stirling’s approximation, ((N!) N N - N), we get:</p>
-<p>[ H ( N N - N - _{i=1}^{M} (n_i n_i - n_i) ) ]</p>
-<p>Given that (_i n_i = N), this simplifies to:</p>
-<p>[ H N - _{i=1}^{M} n_i n_i ]</p>
-<p>Substituting (n_i = N p_i):</p>
-[
-<span class="math display">\[\begin{aligned}
+<p><span class="math display">\[H = \frac{1}{N} \log W\]</span></p>
+<p>If we assume each bucket has an equal prior probability of catching a stone (a uniform distribution with probability <span class="math inline">\(1/M\)</span>), the total probability of observing the macrostate <span class="math inline">\(\mathbf{n}\)</span> follows a standard multinomial distribution:</p>
+<p><span class="math display">\[P(n_1, n_2, \dots, n_M) = W \cdot \left(\frac{1}{M}\right)^N\]</span></p>
+<p>Taking the logarithm of this probability and dividing by <span class="math inline">\(N\)</span>, we obtain:</p>
+<p><span class="math display">\[\frac{1}{N} \log P = \frac{1}{N} \log W + \log\!\left(\frac{1}{M}\right)\]</span></p>
+<p>Because the second term is a fixed constant, we uncover a profound physical truth: finding the macrostate with the largest multiplicity <span class="math inline">\(W\)</span> is mathematically equivalent to finding the state with the highest probability of occurring.</p>
+<p><strong>Uniform distribution to Shannon entropy: </strong> Now, let’s explore what happens in the macroscopic limit as <span class="math inline">\(N \to \infty\)</span>, while keeping the bucket ratios <span class="math inline">\(p_i = n_i/N\)</span> fixed. Expanding our entropy equation <span class="math inline">\(H\)</span>:</p>
+<p><span class="math display">\[H = \frac{1}{N} \log(N!) - \frac{1}{N} \sum_{i=1}^{M} \log(n_i!)\]</span></p>
+<p>By applying Stirling’s approximation (<span class="math inline">\(\log(x!) \approx x \log x - x\)</span>) for large numbers, the equation transforms into:</p>
+<p><span class="math display">\[
+H \approx \frac{1}{N} \left( N \log N - N - \sum_{i=1}^{M} (n_i \log n_i - n_i) \right)
+\]</span></p>
+<p>Given our constraint that <span class="math inline">\(\sum n_i = N\)</span>, the linear <span class="math inline">\(N\)</span> terms cancel out, simplifying the expression to:</p>
+<p><span class="math display">\[
+H \approx \log N - \frac{1}{N} \sum_{i=1}^{M} n_i \log n_i
+\]</span></p>
+<p>Next, we substitute <span class="math inline">\(n_i = N p_i\)</span> back into the sum:</p>
+<p><span class="math display">\[\begin{aligned}
 H &amp;\approx \log N - \frac{1}{N} \sum_{i=1}^{M} (N p_i \log (N p_i)) \\
 &amp;= \log N - \sum_{i=1}^{M} p_i (\log N + \log p_i) \\
 &amp;= \log N - (\log N) \sum_{i=1}^{M} p_i - \sum_{i=1}^{M} p_i \log p_i
-\end{aligned}\]</span>
-<p>]</p>
-<p>Since (_i p_i = 1), the (N) terms cancel out. Through a classical physics setting, we arrive at the <strong>Shannon information entropy</strong>:</p>
-<p>[ H = -_{i=1}^{M} p_i p_i ]</p>
-<p><strong>Non-uniform distribution and KL divergence</strong> Now consider another scenario: what if the inherent probabilities of a stone falling into each bucket are not equal, but instead follow a non-uniform distribution (q = {q_1, q_2, , q_M}) dictated by natural laws or the prior environment? In this case, the total probability of the macro-event becomes:</p>
-<p>[ P(n_1, n_2, , n_M) = W _{i=1}^{M} (q_i)^{n_i} ]</p>
-<p>Taking the logarithm of this new non-uniform probability and dividing by (N), and using the same Stirling approximation derivation as before, we can show:</p>
-<p>[ P(n_1, n_2, , n_M) -_{i=1}^{M} p_i () ]</p>
+\end{aligned}\]</span></p>
+<p>Because the probabilities must sum to one (<span class="math inline">\(\sum p_i = 1\)</span>), the <span class="math inline">\(\log N\)</span> terms beautifully cancel each other out. Out of a classical physics thought experiment, we arrive directly at the formula for Shannon Information Entropy:</p>
+<p><span class="math display">\[H = -\sum_{i=1}^{M} p_i \log p_i\]</span></p>
+<p><strong>From Non-uniform distribution to KL divergence:</strong> Now consider a twist: what if the inherent probabilities of a stone falling into each bucket are not equal? What if they follow a non-uniform prior distribution <span class="math inline">\(q = \{q_1, q_2, \dots, q_M\}\)</span> dictated by natural laws or environmental biases? In this scenario, the total probability of observing the macro-event becomes:</p>
+<p><span class="math display">\[
+P(n_1, n_2, \dots, n_M) = W \prod_{i=1}^{M} (q_i)^{n_i}
+\]</span></p>
+<p>If we take the logarithm of this new non-uniform probability, divide by <span class="math inline">\(N\)</span>, and apply the exact same Stirling approximation logic as before, the derivation yields:</p>
+<p><span class="math display">\[
+\frac{1}{N} \log P(n_1, n_2, \dots, n_M) \approx -\sum_{i=1}^{M} p_i \log\left(\frac{p_i}{q_i}\right)
+\]</span> The right-hand side is instantly recognizable—it is precisely the negative Kullback-Leibler (KL) divergence, <span class="math inline">\(-D_{\mathrm{KL}}(p \parallel q)\)</span>.</p>
 <p>We recognize the right-hand side as exactly the negative of the KL divergence, (-D_{}(p | q)).</p>
-<p>In the limit, the logarithm of the probability of observing a macrostate is precisely the negative KL divergence between the observed distribution (p) and the prior distribution (q).</p>
-<p>Returning to machine learning: when we minimize (D_{}(p | q)), the underlying physical interpretation is analogous — by adjusting the model parameters (q), we transform the probability of observing the sample data (p) from an “extremely unlikely, rare outlier event” into a “most natural, highest-probability typical event.” This is the very foundational logic shared by numerous methods mentioned earlier, such as variational inference, knowledge distillation, and policy constraints in reinforcement learning. It also gives us a glimpse into why some physicists with no prior AI background can make significant contributions to the field in a short time — the two domains are deeply similar at their core.</p>
+<p>The Takeaway: In the macroscopic limit, the logarithm of the probability of observing a specific macrostate is exactly the negative KL divergence between the observed distribution <span class="math inline">\(p\)</span> and the prior distribution <span class="math inline">\(q\)</span>.</p>
+<p><strong>Bringing It Back to Machine Learning:</strong> This brings our story full circle. When we train a machine learning model by minimizing <span class="math inline">\(D_{\mathrm{KL}}(p \parallel q)\)</span>, the underlying physical interpretation is identical. By optimizing the model parameters <span class="math inline">\(q\)</span>, we are actively transforming the probability of observing our training data <span class="math inline">\(p\)</span> from an “extremely unlikely, rare outlier” into the “most natural, highest-probability typical event.”</p>
+<p>This foundational logic governs variational inference, knowledge distillation, and policy constraints in reinforcement learning. It also explains why physicists without formal AI backgrounds often make rapid, groundbreaking contributions to machine learning—beneath the code and the compute, the two domains speak the exact same language at their core.</p>
 </section>
 <section id="conclusion" class="level3">
 <h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
 <p>Since C. E. Shannon proposed the mathematical formulation of information entropy in 1948, this theoretical framework for quantifying uncertainty has laid the bedrock for information theory and statistical learning, continuously shaping the landscape of modern AI and ML.</p>
-<p>From the basic cognitive bias in weather forecasting to the cross-entropy loss that guides parameter updates in deep learning; from probability approximations in VAEs and distribution matching in knowledge distillation, to KL divergence regularization used to constrain LLMs and RL training—the “information cost” metric system built on entropy, cross-entropy, and KL divergence is more than just the underlying grammar of ML algorithms. It has become our core analytical tool for understanding and navigating a world of uncertainty.</p>
+<p>From the basic cognitive bias in weather forecasting to the cross-entropy loss that guides parameter updates in deep learning; from probability approximations in VAEs and distribution matching in knowledge distillation, to KL divergence regularization used to constrain LLMs<span class="citation" data-cites="ouyang2022training">(<a href="#ref-ouyang2022training" role="doc-biblioref"><span class="nocase">Ouyang et al.</span> 2022</a>)</span> and RL training—the “information cost” metric system built on entropy, cross-entropy, and KL divergence is more than just the underlying grammar of ML algorithms. It has become our core analytical tool for understanding and navigating a world of uncertainty.</p>
 <p>Mastering this framework not only clarifies “what is being calculated” during model optimization, but more importantly, uncovers the fundamental logic of “why it is calculated this way.”</p>
-</section>
-<section id="references" class="level3">
-<h3 class="anchored" data-anchor-id="references">References</h3>
-<ol type="1">
-<li>Shannon, C. E. (1948). A mathematical theory of communication. <em>The Bell System Technical Journal</em>, 27(3), 379–423.</li>
-<li>Kullback, S., &amp; Leibler, R. A. (1951). On information and sufficiency. <em>The Annals of Mathematical Statistics</em>, 22(1), 79–86.</li>
-<li>Kingma, D. P., &amp; Welling, M. (2013). Auto-encoding variational Bayes. <em>arXiv preprint arXiv:1312.6114</em>.</li>
-<li>Schulman, J., Wolski, F., Dhariwal, P., Radford, A., &amp; Klimov, O. (2017). Proximal policy optimization algorithms. <em>arXiv preprint arXiv:1707.06347</em>.</li>
-<li>Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., … &amp; Lowe, R. (2022). Training language models to follow instructions with human feedback. <em>Advances in Neural Information Processing Systems</em>, 35, 27730–27744. (InstructGPT paper)</li>
-<li>Haarnoja, T., Zhou, A., Abbeel, P., &amp; Levine, S. (2018). Soft actor-critic: Off-policy maximum entropy deep reinforcement learning with a stochastic actor. In <em>International Conference on Machine Learning</em> (pp.&nbsp;1861–1870). PMLR.</li>
-</ol>
+
 
 
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-haarnoja2018soft" class="csl-entry" role="listitem">
+Haarnoja, Tuomas, Aurick Zhou, Pieter Abbeel, and Sergey Levine. 2018. <span>“Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor.”</span> <em>International Conference on Machine Learning</em>, 1861–70.
+</div>
+<div id="ref-hinton2015distilling" class="csl-entry" role="listitem">
+Hinton, Geoffrey, Oriol Vinyals, and Jeff Dean. 2015. <span>“Distilling the Knowledge in a Neural Network.”</span> <em>arXiv Preprint arXiv:1503.02531</em>.
+</div>
+<div id="ref-kingma2013auto" class="csl-entry" role="listitem">
+Kingma, Diederik P, and Max Welling. 2013. <span>“Auto-Encoding Variational Bayes.”</span> <em>arXiv Preprint arXiv:1312.6114</em>.
+</div>
+<div id="ref-kullback1951information" class="csl-entry" role="listitem">
+Kullback, Solomon, and Richard A Leibler. 1951. <span>“On Information and Sufficiency.”</span> <em>The Annals of Mathematical Statistics</em> 22 (1): 79–86.
+</div>
+<div id="ref-ouyang2022training" class="csl-entry" role="listitem">
+<span class="nocase">Ouyang, Long, Jeffrey Wu, Xu Jiang, et al.</span> 2022. <span>“Training Language Models to Follow Instructions with Human Feedback.”</span> <em>Advances in Neural Information Processing Systems</em> 35: 27730–44.
+</div>
+<div id="ref-schulman2017proximal" class="csl-entry" role="listitem">
+Schulman, John, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. <span>“Proximal Policy Optimization Algorithms.”</span> <em>arXiv Preprint arXiv:1707.06347</em>.
+</div>
+<div id="ref-shannon1948mathematical" class="csl-entry" role="listitem">
+Shannon, Claude Elwood. 1948. <span>“A Mathematical Theory of Communication.”</span> <em>The Bell System Technical Journal</em> 27 (3): 379–423.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
