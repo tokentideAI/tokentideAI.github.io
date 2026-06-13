@@ -1,0 +1,12 @@
+{
+  "hash": "49b47783a0bbaa603ab87aa81ec84420",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"深入理解 Transformer 中的注意力机制\"\nauthor: \"Yitian Chen\"\ndate: \"2026-06-11\"\ncategories: [LLMs, Information theory]\ndescription: \"从公式推导到代码实现，全面拆解 Scaled Dot-Product Attention。\"\ndraft: false\n---\n\n## 引言\n\n自注意力机制（Self-Attention）是 Transformer 架构的核心组件。它在机器翻译、文本生成等任务中取得了巨大成功。本文将从数学形式出发，给出一个简明的 NumPy 实现，并讨论其计算特性。\n\n## 注意力公式\n\n对于一个查询（Query）$Q$、键（Key）$K$ 和值（Value）$V$，Scaled Dot-Product Attention 的计算公式为：\n\n$$\n\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^\\top}{\\sqrt{d_k}}\\right) V\n$$\n\n其中 $d_k$ 是键向量的维度。\n\n## 代码实现\n\n以下是用 NumPy 实现的注意力计算。这个代码块会在渲染时自动执行并显示输出。\n\n::: {#c1780904 .cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\n\ndef scaled_dot_product_attention(Q, K, V):\n    d_k = K.shape[-1]\n    scores = np.matmul(Q, K.T) / np.sqrt(d_k)\n    attention_weights = np.exp(scores) / np.sum(np.exp(scores), axis=-1, keepdims=True)\n    output = np.matmul(attention_weights, V)\n    return output, attention_weights\n\n# 示例：假设 batch 中一个样本\nQ = np.random.randn(4, 8)   # 4 个查询，每个维度 8\nK = np.random.randn(4, 8)\nV = np.random.randn(4, 8)\n\nout, attn = scaled_dot_product_attention(Q, K, V)\nprint(\"输出形状:\", out.shape)\nprint(\"注意力权重矩阵:\\n\", np.round(attn, 3))\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n输出形状: (4, 8)\n注意力权重矩阵:\n [[0.277 0.103 0.101 0.519]\n [0.136 0.177 0.04  0.647]\n [0.547 0.012 0.411 0.031]\n [0.113 0.268 0.147 0.472]]\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "hello_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

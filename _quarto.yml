@@ -1,0 +1,25 @@
+project:
+  type: website
+
+website:
+  title: "TokenTide AI"
+  site-url: https://tokenTideAI.github.io/
+  description: "LLMs, Planning, Decision Making"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: posts/01_info_theory.qmd
+        text: Post
+  page-footer:
+    left: "© 2026 Yitian Chen"
+    right: "Powered by Quarto"
+
+format:
+  html:
+    theme: 
+      light: cosmo
+      dark: darkly
+    css: styles.css   # 引入样式
+    code-copy: true
+    highlight-style: github

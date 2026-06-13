@@ -1,0 +1,12 @@
+---
+title: "Welcome to TokenTide AI's Tech Blog 👋"
+listing:
+  contents: "posts"          # 扫描 posts 目录下的文章
+  sort: "date desc"          # 按日期倒序排列
+  type: table              # 默认列表样式
+  categories: true           # 显示分类
+  fields: [title, author, date]
+  feed: true                 # 生成 RSS feed
+---
+
+

@@ -1,0 +1,32 @@
+/* css styles */
+/* 让整个页面的主要内容区域更宽 */
+/* 1. 让整个列表页的主内容区更宽（从而标题更宽） */
+/* custom.scss */
+
+/* 1. 缩小每篇博客条目之间的垂直间距 */
+.quarto-listing-default .quarto-post {
+  padding-bottom: 1rem !important;  /* 默认通常较大，这里改小 */
+  margin-bottom: 1rem !important;
+  border-bottom: 1px solid #dee2e6; /* 可选：添加分割线让视觉更清晰 */
+}
+
+/* 2. 缩小标题的字体大小和底部间距 */
+div.listing-title {
+  font-size: 1.3rem !important;
+  margin-bottom: 0.3rem !important;
+}
+
+/* 3. 让左侧的日期和作者更紧凑 */
+div.metadata {
+  font-size: 0.9rem !important;
+  line-height: 1.2 !important;
+}
+
+.listing-date {
+  margin-bottom: 0.2rem !important;
+}
+
+/* 4. 如果您不显示图片，可以适当调整左右两栏的比例或去掉多余的 Padding */
+.quarto-listing-default .body {
+  padding-left: 0 !important;
+}
