@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>TokenTide AI</title>
+<link>https://tokenTideAI.github.io/</link>
+<atom:link href="https://tokenTideAI.github.io/index.xml" rel="self" type="application/rss+xml"/>
+<description>LLMs, Planning, Decision Making</description>
+<generator>quarto-1.9.38</generator>
+<lastBuildDate>Wed, 10 Jun 2026 16:00:00 GMT</lastBuildDate>
+<item>
+  <title>Information Theory in Language Models (Part 1): Entropy, Cross-Entropy, and KL Divergence</title>
+  <dc:creator>Yitian Chen</dc:creator>
+  <link>https://tokenTideAI.github.io/posts/01_info_theory.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="self-information" class="level3">
+<h3 class="anchored" data-anchor-id="self-information">Self-Information</h3>
+<p>Information theory <span class="citation" data-cites="shannon1948mathematical">(Shannon 1948)</span> provides a rigorous mathematical framework for quantifying “information” and “uncertainty.”</p>
+<p>Every event carries a certain amount of information. For a random event, its information content can be intuitively understood as the “degree of surprise”: the lower the prior probability of an event, the more information it conveys when it actually occurs. Take weather as an example: * “It rained yesterday” is an established fact with zero surprise, so it contains zero information. * However, “it will rain tomorrow” remains uncertain, so when it happens, it carries actual information.</p>
+<p>Imagine you are hiking deep in the mountains with absolutely no cell phone signal. You know nothing about tomorrow’s cloud cover, humidity, atmospheric pressure, or any other physical conditions. In such a state of extreme cognitive deprivation, the most conservative inference you can make, is that that the probabilities of tomorrow being sunny, cloudy, or rainy are evenly split at 1/3 each, based on the principle of symmetry. This reflects a severe lack of knowledge regarding the weather system’s underlying laws—to you, the system’s <strong>uncertainty is immense</strong>.</p>
+<p>In contrast, if you check an authoritative weather forecast today and learn that the probability of a sunny day tomorrow is 0.99. Where does such high certainty come from? In fact, a massive amount of information has already been injected into the forecasting system in advance. Meteorologists have digested the original uncertainty using satellite images, historical weather models, and supercomputer simulations. Achieving such high certainty means that, during this prediction process, physical determinism has overwhelmingly outweighed randomness. From this we can draw a rather philosophical conclusion:</p>
+<p><strong>Information is essentially the reduction in uncertainty from learning an outcome.</strong></p>
+<p>To quantify how much uncertainty has been reduced, we need a metrics to measure the uncertainty. This leads to the mathematical definition of information. For a random variable (X) defined on a discrete outcome space () with probability mass function (p(x)), the amount of information gained by observing the event (X=x), the <strong>self-information</strong>,is defined as:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AI(X=x)%20=%20-%5Clog%20p(x)%0A"></p>
+<p>The base of the logarithm is usuall 2 (unit: bit) or base (e) (unit: nat). (I(x)) measures the “amount of information” obtained when we observe a specific outcome (x). Returning to the weather example:</p>
+<ul>
+<li>Example 1: If “it rained yesterday” is a certain fact, <img src="https://latex.codecogs.com/png.latex?p(x=%5Ctext%7Brainy%7D)%20=%201">, then <img src="https://latex.codecogs.com/png.latex?I(x)%20=%20-%5Cln(1)%20=%200">. A certain event contains no information.</li>
+<li>Example 2: Suppose a weather station predicts that the prior probability of rain tomorrow is <img src="https://latex.codecogs.com/png.latex?p(x=%5Ctext%7Brainy%7D)%20=%200.1">. Then the self-information of the event “it rains tomorrow” is <img src="https://latex.codecogs.com/png.latex?I(X=%5Ctext%7Brainy%7D)%20=%20-%5Cln(0.1)%20%5Capprox%202.3"> nats. This means that if it actually rains tomorrow, we will receive about 2.3 nats of “information” or “surprise.”</li>
+</ul>
+</section>
+<section id="shannon-entropy" class="level3">
+<h3 class="anchored" data-anchor-id="shannon-entropy">Shannon Entropy</h3>
+<p>Using the weather example, if the probability of rain is <img src="https://latex.codecogs.com/png.latex?p(x)">, the information content of the event “rain tomorrow” is <img src="https://latex.codecogs.com/png.latex?-%5Clog(p(x))">. If we enumerate all possible outcomes (rainy, cloudy, sunny) and compute the expectation of their information contents. This expectation is what we call <strong>entropy</strong>.</p>
+<p>Mathematically, suppose an event (X) (such as tomorrow’s weather) has <img src="https://latex.codecogs.com/png.latex?n"> possible outcomes with respective probabilities <img src="https://latex.codecogs.com/png.latex?p(x_i)">. The expected information, or entropy, is expressed as:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AH(X)%20=%20%5Cmathbb%7BE%7D_%7Bx%20%5Csim%20p%7D%5BI(x)%5D%20=%20-%5Csum_%7Bi=1%7D%5E%7Bn%7D%20p(x_i)%20%5Clog%20p(x_i)%20%5Cquad%20%5Ctext%7B(Discrete%20case)%7D%0A"></p>
+<p>The higher the entropy, the greater the system’s uncertainty. For instance, if the probabilities of tomorrow’s weather are: <img src="https://latex.codecogs.com/png.latex?p(x_1=%5Ctext%7Brainy%7D)%20=%200.1,%5C;%20p(x_2=%5Ctext%7Bcloudy%7D)%20=%200.3,%5C;%20p(x_3=%5Ctext%7Bsunny%7D)%20=%200.6%5C."></p>
+<p>The entropy is: <img src="https://latex.codecogs.com/png.latex?%0AH(X)%20=%20-0.1%20%5Cln(0.1)%20-%200.3%20%5Cln(0.3)%20-%200.6%20%5Cln(0.6)%20%5Capprox%200.898%20%5Ctext%7B%20nats%7D%0A"></p>
+<p>This value (approximate 0.898 nats) represents our measure of the average uncertainty regarding tomorrow’s weather.</p>
+</section>
+<section id="cross-entropy" class="level3">
+<h3 class="anchored" data-anchor-id="cross-entropy">Cross Entropy</h3>
+<p>In reality, we rarely know the true distribution <img src="https://latex.codecogs.com/png.latex?p">; instead, we have a predicted distribution <img src="https://latex.codecogs.com/png.latex?q">. For instance, we might rely on a weather app to predict tomorrow’s weather, but that prediction isn’t necessarily perfect. We can use <strong>cross-entropy</strong> <img src="https://latex.codecogs.com/png.latex?H(p,%20q)"> to define the measurement cost required when we use a suboptimal predicted distribution <img src="https://latex.codecogs.com/png.latex?q"> to represent the average information from the true distribution <img src="https://latex.codecogs.com/png.latex?p">: <img src="https://latex.codecogs.com/png.latex?%0AH(p,%20q)%20=%20%5Cmathbb%7BE%7D_%7Bx%20%5Csim%20p(x)%7D%5B-%5Clog%20q(x)%5D%20=%20-%5Csum_%7Bx%7D%20p(x)%20%5Clog%20q(x)%0A"> Note that the expectation is taken with respect to the true distribution <img src="https://latex.codecogs.com/png.latex?p">, but the log probabilities come from the predictive model distribution <img src="https://latex.codecogs.com/png.latex?q">.</p>
+<p>Let’s go back to the weather forecast example we looked at earlier. Suppose the true probabilities of sunny, cloudy, and rainy are <img src="https://latex.codecogs.com/png.latex?p%20=%20%5C%7B0.1,%200.3,%200.6%5C%7D">. First, we calculate the entropy of the true distribution itself, which is the minimum average information required under optimal encoding (using base <img src="https://latex.codecogs.com/png.latex?e">, unit: nats):</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AH(p)%20=%20-%5Csum_%7Bx%7D%20p(x)%20%5Clog%20p(x)%20=%20-(0.1%5Cln0.1%20+%200.3%5Cln0.3%20+%200.6%5Cln0.6)%20%5Capprox%200.898%0A"> Now, suppose two weather apps provide different predicted distributions for tomorrow:</p>
+<ul>
+<li>Model A (More accurate): <img src="https://latex.codecogs.com/png.latex?q_A%20=%20%5C%7B0.15,%200.25,%200.60%5C%7D"></li>
+<li>Model B (Less accurate): <img src="https://latex.codecogs.com/png.latex?q_B%20=%20%5C%7B0.70,%200.20,%200.10%5C%7D"></li>
+</ul>
+<p>We can calculate the cross-entropy of these two predictions relative to the true distribution:</p>
+<ul>
+<li>Cross-entropy of Model A: <img src="https://latex.codecogs.com/png.latex?H(p,q_A)%20=%20-(0.1%5Cln0.15%20+%200.3%5Cln0.25%20+%200.6%5Cln0.60)%20%5Capprox%200.912"></li>
+<li>Cross-entropy of Model B: <img src="https://latex.codecogs.com/png.latex?H(p,q_B)%20=%20-(0.1%5Cln0.70%20+%200.3%5Cln0.20%20+%200.6%5Cln0.10)%20%5Capprox%201.901"></li>
+</ul>
+<p>As we can see, Model A’s cross-entropy (0.912) is much closer to the true entropy (0.897). A lower cross-entropy indicates that the predicted distribution is closer to the true distribution.</p>
+<p>By generalizing the weather classification example, we arrive at the cross-entropy loss function—the workhorse behind most machine learning classifiers. When we train deep neural networks for tasks like image classification or language modeling, the central goal is to minimize this cross-entropy loss via backpropagation. In doing so, we drive the model’s predicted distribution qq to match the true label distribution pp as closely as possible.</p>
+</section>
+<section id="kl-divergence" class="level3">
+<h3 class="anchored" data-anchor-id="kl-divergence">KL Divergence</h3>
+<p>In the weather prediction example above, a good prediction model (Model A) is clearly superior to a poor one (Model B). But what if we want to further quantify exactly how much extra information cost (i.e., cognitive bias or prediction error) we paid because the predicted distribution <img src="https://latex.codecogs.com/png.latex?q"> is inaccurate compared to the ideal state <img src="https://latex.codecogs.com/png.latex?p">? This is exactly what KL Divergence answers <span class="citation" data-cites="kullback1951information">(Kullback and Leibler 1951)</span>.</p>
+<p>In information theory, there is a classic information cost decomposition:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cunderbrace%7BH(p,%20q)%7D_%7B%5Ctext%7BTotal%20predictive%20cost%7D%7D%20=%20%5Cunderbrace%7BH(p)%7D_%7B%5Ctext%7BInherent%20randomness%20(minimum%20possible%20cost)%7D%7D%20+%20%5Cunderbrace%7BD_%7B%5Cmathrm%7BKL%7D%7D(p%20%5C%7C%20q)%7D_%7B%5Ctext%7BExtra%20cost%20due%20to%20model%20inaccuracy%7D%7D%0A"></p>
+<p>Intuitively:</p>
+<ol type="1">
+<li><img src="https://latex.codecogs.com/png.latex?H(p)"> (entropy): this is the intrinsic physical noise of the world. Even if your model were omniscient, this part of uncertainty could never be eliminated.</li>
+<li><img src="https://latex.codecogs.com/png.latex?D_%7B%5Cmathrm%7BKL%7D%7D(p%20%5C%7C%20q)"> (KL divergence): this is the “cognitive gap” between you and the real world. It measures the “distance” (asymmetric) between two probability distributions. the information redundancy or extra waste caused by the model’s imperfection.</li>
+</ol>
+<p>We can then derive the formula of KL divergence:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AD_%7B%5Cmathrm%7BKL%7D%7D(p%20%5C%7C%20q)%20=%20H(p,%20q)%20-%20H(p)%20=%20%5Csum_%7Bi=1%7D%5E%7Bn%7D%20p(x_i)%20%5Clog%5Cleft(%5Cfrac%7Bp(x_i)%7D%7Bq(x_i)%7D%5Cright)%0A"></p>
+<p>Using our running example, the true distribution <img src="https://latex.codecogs.com/png.latex?p=%5C%7B0.1,%200.3,%200.6%5C%7D"> has an entropy <img src="https://latex.codecogs.com/png.latex?H(p)%20%5Capprox%200.897"> nats.</p>
+<p>Model A (More accurate):</p>
+<ul>
+<li>Prediction: <img src="https://latex.codecogs.com/png.latex?q_A%20=%20%5C%7B0.15,%200.25,%200.60%5C%7D"></li>
+<li>Cross-Entropy: <img src="https://latex.codecogs.com/png.latex?H(p,%20q_A)%20%5Capprox%200.912"> nats</li>
+<li>KL Divergence: <img src="https://latex.codecogs.com/png.latex?D_%7BKL%7D(p%20%5Cparallel%20q_A)%20=%200.912%20-%200.897%20=%200.015"> nats</li>
+<li>Analysis: Information redundancy is extremely small (near 0), indicating Model A’s predictive efficiency is very close to the theoretical optimum.</li>
+</ul>
+<p>Model B (Less accurate):</p>
+<ul>
+<li>Prediction: <img src="https://latex.codecogs.com/png.latex?q_B%20=%20%5C%7B0.70,%200.20,%200.10%5C%7D"></li>
+<li>Cross-Entropy: <img src="https://latex.codecogs.com/png.latex?H(p,%20q_B)%20%5Capprox%201.901"> nats</li>
+<li>KL Divergence: <img src="https://latex.codecogs.com/png.latex?D_%7BKL%7D(p%20%5Cparallel%20q_B)%20=%201.901%20-%200.897%20=%201.004"> nats</li>
+<li>Analysis: Huge information redundancy. This means due to Model B’s severe bias, every time it encodes weather information, it wastes over 1 nat of information just dealing with its own errors.</li>
+</ul>
+<p>KL Divergence has two classic properties:</p>
+<ol type="1">
+<li>: <img src="https://latex.codecogs.com/png.latex?D_%7BKL%7D(p%20%5Cparallel%20q)%20%5Cneq%20D_%7BKL%7D(q%20%5Cparallel%20p)">. KL divergence is not a true geometric “distance metric” (which requires symmetry). It measures the information lost when using <img src="https://latex.codecogs.com/png.latex?q"> to approximate <img src="https://latex.codecogs.com/png.latex?p">, taking <img src="https://latex.codecogs.com/png.latex?p"> as the baseline.</li>
+<li>Non-negativity: <img src="https://latex.codecogs.com/png.latex?D_%7BKL%7D(p%20%5Cparallel%20q)%20%5Cge%200">. According to Jensen’s inequality, the divergence is 0 if and only if <img src="https://latex.codecogs.com/png.latex?p=q">. This reflects a common-sense principle in information theory: no predictive encoding can be better than the true distribution itself. Any imperfect model will inevitably incur extra information costs.</li>
+</ol>
+</section>
+<section id="beyond-weather-forecasting-applications-in-machine-learning" class="level3">
+<h3 class="anchored" data-anchor-id="beyond-weather-forecasting-applications-in-machine-learning">Beyond Weather Forecasting: Applications in Machine Learning</h3>
+<p>The principles of entropy, cross-entropy, and KL divergence form a powerful “information-cost” framework that naturally extends into the core of modern machine learning, deep learning, and reinforcement learning.</p>
+<p><strong>Supervised Learning:</strong> In classic single-label classification, the ground-truth label is typically represented as a one-hot vector. For the correct class <img src="https://latex.codecogs.com/png.latex?y%5E*">, the true probability is <img src="https://latex.codecogs.com/png.latex?P(y%5E*%7Cx)%20=%201"> and zero for all other classes, resulting in a true distribution entropy of <img src="https://latex.codecogs.com/png.latex?H(P)%20=%200">. Consequently, the cross-entropy loss used to train classifiers reduces entirely to the negative log-likelihood:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cmathcal%7BL%7D_%7B%5Cmathrm%7BCE%7D%7D%20=%20H(P,%20Q)%20=%20-%5Csum_%7By%7D%20P(y%7Cx)%20%5Clog%20Q(y%7Cx)%20=%20-%5Clog%20Q(y%5E*%7Cx).%0A"></p>
+<p>Because the inherent entropy <img src="https://latex.codecogs.com/png.latex?H(P)%20=%200">, minimizing the cross-entropy is mathematically equivalent to minimizing the KL divergence <img src="https://latex.codecogs.com/png.latex?D_%7B%5Cmathrm%7BKL%7D%7D(P%20%5Cparallel%20Q)">—essentially forcing the model’s predicted distribution <img src="https://latex.codecogs.com/png.latex?Q"> to map perfectly to the true distribution <img src="https://latex.codecogs.com/png.latex?P">.</p>
+<p><strong>Generative Models:</strong> In generative models like Variational Autoencoders (VAEs) <span class="citation" data-cites="kingma2013auto">(Kingma and Welling 2013)</span>, KL divergence acts directly as an optimization objective to regularize the latent variable distribution. VAEs are trained by maximizing the Evidence Lower Bound (ELBO), formulated as: <img src="https://latex.codecogs.com/png.latex?%0A%5Cmathrm%7BELBO%7D%20=%20%5Cmathbb%7BE%7D_%7Bz%20%5Csim%20Q_%5Cphi(z%7Cx)%7D%5B%5Clog%20P_%5Ctheta(x%7Cz)%5D%20-%20%5Cbeta%20%5Ccdot%20D_%7B%5Cmathrm%7BKL%7D%7D(Q_%5Cphi(z%7Cx)%20%5C%7C%20P(z)).%0A"> The corresponding minimization loss is (_{} = -).</p>
+<p>To reframe this as a minimization problem, the loss function becomes <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BL%7D_%7B%5Cmathrm%7BVAE%7D%7D%20=%20-%5Cmathrm%7BELBO%7D">, which balances two critical components:</p>
+<ul>
+<li>The Reconstruction Term: <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5B%5Clog%20P_%5Ctheta(x%7Cz)%5D"> ensures the decoder can accurately reconstruct the real data <img src="https://latex.codecogs.com/png.latex?x"> from the latent variable <img src="https://latex.codecogs.com/png.latex?z"> (typically measured via mean squared error or cross-entropy).</li>
+<li>The Regularization Term: <img src="https://latex.codecogs.com/png.latex?D_%7B%5Cmathrm%7BKL%7D%7D(Q_%5Cphi(z%7Cx)%20%5Cparallel%20P(z))"> forces the encoder’s output posterior distribution <img src="https://latex.codecogs.com/png.latex?Q_%5Cphi(z%7Cx)"> to approximate a defined prior <img src="https://latex.codecogs.com/png.latex?P(z)"> (such as a standard normal distribution <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BN%7D(0,%20I)">).</li>
+</ul>
+<p><strong>Knowledge Distillation: </strong> Knowledge distillation<span class="citation" data-cites="hinton2015distilling">(Hinton et al. 2015)</span> aims to transfer the rich representations embedded in a large “teacher model” (such as DeepSeek, GPT, or Gemini) into a lightweight “student model.” To ensure the student learns not only the hard labels (0/1) but also the nuanced inter-class similarities discovered by the teacher, we introduce KL divergence to align their soft labels:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cmathcal%7BL%7D_%7B%5Cmathrm%7BKD%7D%7D%20=%20%5Calpha%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Cmathrm%7BCE%7D%7D(y,%20q_s)%20+%20(1-%5Calpha)%20%5Ccdot%20T%5E2%20%5Ccdot%20D_%7B%5Cmathrm%7BKL%7D%7D(p_t%20%5C%7C%20p_s),%0A"> where the teacher’s and student’s smoothed probabilities at temperature <img src="https://latex.codecogs.com/png.latex?T"> are defined as: <img src="https://latex.codecogs.com/png.latex?%0Ap_t%20=%20%5Cmathrm%7Bsoftmax%7D%5C!%5Cleft(%5Cfrac%7Bz_t%7D%7BT%7D%5Cright),%20%5Cquad%20p_s%20=%20%5Cmathrm%7Bsoftmax%7D%5C!%5Cleft(%5Cfrac%7Bz_s%7D%7BT%7D%5Cright).%0A"></p>
+<p>A higher temperature <img src="https://latex.codecogs.com/png.latex?T"> yields a smoother distribution that reveals hidden inter-class relationships, while multiplying the term by <img src="https://latex.codecogs.com/png.latex?T%5E2"> preserves the original gradient scale of the soft-label loss. By minimizing <img src="https://latex.codecogs.com/png.latex?D_%7B%5Cmathrm%7BKL%7D%7D(p_t%20%5Cparallel%20p_s)">, the student model is forced to replicate the teacher’s reasoning logic and predictive confidence. This yields a significantly stronger generalization capability than could be achieved by fitting hard labels alone.</p>
+<p><strong>Reinforcement Learning: </strong> In reinforcement learning (RL), KL divergence and entropy play distinct but equally critical roles in stabilizing training and promoting exploration.</p>
+<ul>
+<li><p><strong>KL divergence for constraining policy updates:</strong> In the clipped version of Proximal Policy Optimization (PPO) <span class="citation" data-cites="schulman2017proximal">(Schulman et al. 2017)</span>, the objective function is: <img src="https://latex.codecogs.com/png.latex?%0A%20%20%5Cmathcal%7BL%7D%5E%7B%5Cmathrm%7BCLIP%7D%7D(%5Ctheta)%20=%20%5Chat%7B%5Cmathbb%7BE%7D%7D_t%20%5Cleft%5B%20%5Cmin%5Cleft(%20r_t(%5Ctheta)%20%5Chat%7BA%7D_t,%5C;%20%5Cmathrm%7Bclip%7D(r_t(%5Ctheta),%201-%5Cepsilon,%201+%5Cepsilon)%20%5Chat%7BA%7D_t%20%5Cright)%20%5Cright%5D,%0A%20%20"> where <img src="https://latex.codecogs.com/png.latex?r_t(%5Ctheta)%20=%20%5Cfrac%7B%5Cpi_%5Ctheta(a_t%7Cs_t)%7D%7B%5Cpi_%7B%5Ctheta_%7B%5Cmathrm%7Bold%7D%7D%7D(a_t%7Cs_t)%7D">. By restricting the probability ratio <img src="https://latex.codecogs.com/png.latex?r_t(%5Ctheta)"> to the interval <img src="https://latex.codecogs.com/png.latex?%5B1-%5Cepsilon,%201+%5Cepsilon%5D">, the clipping operation implicitly bounds the KL divergence <img src="https://latex.codecogs.com/png.latex?D_%7B%5Cmathrm%7BKL%7D%7D(%5Cpi_%7B%5Ctheta_%7B%5Cmathrm%7Bold%7D%7D%7D%20%5Cparallel%20%5Cpi_%5Ctheta)">. This prevents drastic, destructive policy updates and ensures monotonic training stability.</p></li>
+<li><p><strong>Entropy for encouraging exploration:</strong> To prevent a policy from prematurely converging to a deterministic, suboptimal solution, many policy gradient methods incorporate an entropy regularization term into the loss:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%20%20%5Cmathcal%7BL%7D%20=%20%5Cmathbb%7BE%7D_t%5Cleft%5B%20%5Clog%20%5Cpi_%5Ctheta(a_t%7Cs_t)%20%5Chat%7BA%7D_t%20%5Cright%5D%20+%20%5Cbeta%20%5Ccdot%20H(%5Cpi_%5Ctheta(%5Ccdot%7Cs_t)),%0A"></p></li>
+</ul>
+<p>Soft Actor-Critic (SAC) <span class="citation" data-cites="haarnoja2018soft">(Haarnoja et al. 2018)</span> advances this concept by establishing a formal “maximum entropy” RL framework. SAC maximizes a weighted sum of the expected return and the policy’s entropy by optimizing the following objective:<img src="https://latex.codecogs.com/png.latex?J(%5Cpi)%20=%20%5Csum_t%20%5Cmathbb%7BE%7D_%7B(s_t,%20a_t)%7D%20%5Cleft%5B%20r(s_t,%20a_t)%20+%20%5Calpha%20H(%5Cpi(%5Ccdot%7Cs_t))%20%5Cright%5D.">This formulation structurally guarantees a superior balance between exploration and exploitation, leading to more robust policies with enhanced generalization across varied environments.</p>
+</section>
+<section id="the-physical-roots-thermodynamics-and-statistical-mechanics" class="level3">
+<h3 class="anchored" data-anchor-id="the-physical-roots-thermodynamics-and-statistical-mechanics">The Physical Roots: Thermodynamics and Statistical Mechanics</h3>
+<p>Before wrapping up, let us revisit the origins of entropy and KL divergence in their birthplace: thermodynamics and statistical physics.</p>
+<p><strong>The Physical picture: particles and energy levels: </strong> Imagine randomly throwing <img src="https://latex.codecogs.com/png.latex?N"> small stones (analogous to independent particles) into <img src="https://latex.codecogs.com/png.latex?M"> buckets (analogous to energy levels). The bucket each stone lands in is random, ultimately yielding an observed distribution where <img src="https://latex.codecogs.com/png.latex?n_i"> is the number of stones in bucket <img src="https://latex.codecogs.com/png.latex?i">. This process naturally generates a probability distribution where the proportion of stones in each bucket is <img src="https://latex.codecogs.com/png.latex?p_i%20=%20n_i%20/%20N">.</p>
+<p>Suppose we only care about the final macrostate—how many stones end up in each bucket, regardless of which specific stone went where. We describe this macrostate using a vector <img src="https://latex.codecogs.com/png.latex?%5Cmathbf%7Bn%7D%20=%20%5C%7Bn_1,%20n_2,%20%5Cdots,%20n_M%5C%7D"> under the strict constraint that <img src="https://latex.codecogs.com/png.latex?%5Csum%20n_i%20=%20N">. The question then becomes: How many microscopic arrangements (microstates) lead to this exact macrostate?</p>
+<p>The first stone has <img src="https://latex.codecogs.com/png.latex?N"> possible placements, the second <img src="https://latex.codecogs.com/png.latex?N-1">, and so on, giving <img src="https://latex.codecogs.com/png.latex?N!"> total permutations. However, because we do not care about the ordering of stones within the same bucket, we must divide out the redundant permutations by taking the factorial of each bucket’s occupation number. This gives us the total number of microstates (the multinomial coefficient) behind the macrostate:</p>
+<p><img src="https://latex.codecogs.com/png.latex?W%20=%20%5Cfrac%7BN!%7D%7B%5Cprod_%7Bi=1%7D%5E%7BM%7D%20n_i!%7D"></p>
+<p>In physics, <img src="https://latex.codecogs.com/png.latex?W"> is known as the multiplicity. Ludwig Boltzmann famously proposed that the physical entropy of a system is proportional to the logarithm of its multiplicity. Therefore, we can define the physical entropy per particle as:</p>
+<p>If we further assume that each bucket has an equal prior probability (i.e., a uniform distribution with probability (1/M)), then the total probability of observing the macrostate () follows a standard multinomial distribution:</p>
+<p><img src="https://latex.codecogs.com/png.latex?H%20=%20%5Cfrac%7B1%7D%7BN%7D%20%5Clog%20W"></p>
+<p>If we assume each bucket has an equal prior probability of catching a stone (a uniform distribution with probability <img src="https://latex.codecogs.com/png.latex?1/M">), the total probability of observing the macrostate <img src="https://latex.codecogs.com/png.latex?%5Cmathbf%7Bn%7D"> follows a standard multinomial distribution:</p>
+<p><img src="https://latex.codecogs.com/png.latex?P(n_1,%20n_2,%20%5Cdots,%20n_M)%20=%20W%20%5Ccdot%20%5Cleft(%5Cfrac%7B1%7D%7BM%7D%5Cright)%5EN"></p>
+<p>Taking the logarithm of this probability and dividing by <img src="https://latex.codecogs.com/png.latex?N">, we obtain:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B1%7D%7BN%7D%20%5Clog%20P%20=%20%5Cfrac%7B1%7D%7BN%7D%20%5Clog%20W%20+%20%5Clog%5C!%5Cleft(%5Cfrac%7B1%7D%7BM%7D%5Cright)"></p>
+<p>Because the second term is a fixed constant, we uncover a profound physical truth: finding the macrostate with the largest multiplicity <img src="https://latex.codecogs.com/png.latex?W"> is mathematically equivalent to finding the state with the highest probability of occurring.</p>
+<p><strong>Uniform distribution to Shannon entropy: </strong> Now, let’s explore what happens in the macroscopic limit as <img src="https://latex.codecogs.com/png.latex?N%20%5Cto%20%5Cinfty">, while keeping the bucket ratios <img src="https://latex.codecogs.com/png.latex?p_i%20=%20n_i/N"> fixed. Expanding our entropy equation <img src="https://latex.codecogs.com/png.latex?H">:</p>
+<p><img src="https://latex.codecogs.com/png.latex?H%20=%20%5Cfrac%7B1%7D%7BN%7D%20%5Clog(N!)%20-%20%5Cfrac%7B1%7D%7BN%7D%20%5Csum_%7Bi=1%7D%5E%7BM%7D%20%5Clog(n_i!)"></p>
+<p>By applying Stirling’s approximation (<img src="https://latex.codecogs.com/png.latex?%5Clog(x!)%20%5Capprox%20x%20%5Clog%20x%20-%20x">) for large numbers, the equation transforms into:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AH%20%5Capprox%20%5Cfrac%7B1%7D%7BN%7D%20%5Cleft(%20N%20%5Clog%20N%20-%20N%20-%20%5Csum_%7Bi=1%7D%5E%7BM%7D%20(n_i%20%5Clog%20n_i%20-%20n_i)%20%5Cright)%0A"></p>
+<p>Given our constraint that <img src="https://latex.codecogs.com/png.latex?%5Csum%20n_i%20=%20N">, the linear <img src="https://latex.codecogs.com/png.latex?N"> terms cancel out, simplifying the expression to:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AH%20%5Capprox%20%5Clog%20N%20-%20%5Cfrac%7B1%7D%7BN%7D%20%5Csum_%7Bi=1%7D%5E%7BM%7D%20n_i%20%5Clog%20n_i%0A"></p>
+<p>Next, we substitute <img src="https://latex.codecogs.com/png.latex?n_i%20=%20N%20p_i"> back into the sum:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Baligned%7D%0AH%20&amp;%5Capprox%20%5Clog%20N%20-%20%5Cfrac%7B1%7D%7BN%7D%20%5Csum_%7Bi=1%7D%5E%7BM%7D%20(N%20p_i%20%5Clog%20(N%20p_i))%20%5C%5C%0A&amp;=%20%5Clog%20N%20-%20%5Csum_%7Bi=1%7D%5E%7BM%7D%20p_i%20(%5Clog%20N%20+%20%5Clog%20p_i)%20%5C%5C%0A&amp;=%20%5Clog%20N%20-%20(%5Clog%20N)%20%5Csum_%7Bi=1%7D%5E%7BM%7D%20p_i%20-%20%5Csum_%7Bi=1%7D%5E%7BM%7D%20p_i%20%5Clog%20p_i%0A%5Cend%7Baligned%7D"></p>
+<p>Because the probabilities must sum to one (<img src="https://latex.codecogs.com/png.latex?%5Csum%20p_i%20=%201">), the <img src="https://latex.codecogs.com/png.latex?%5Clog%20N"> terms beautifully cancel each other out. Out of a classical physics thought experiment, we arrive directly at the formula for Shannon Information Entropy:</p>
+<p><img src="https://latex.codecogs.com/png.latex?H%20=%20-%5Csum_%7Bi=1%7D%5E%7BM%7D%20p_i%20%5Clog%20p_i"></p>
+<p><strong>From Non-uniform distribution to KL divergence:</strong> Now consider a twist: what if the inherent probabilities of a stone falling into each bucket are not equal? What if they follow a non-uniform prior distribution <img src="https://latex.codecogs.com/png.latex?q%20=%20%5C%7Bq_1,%20q_2,%20%5Cdots,%20q_M%5C%7D"> dictated by natural laws or environmental biases? In this scenario, the total probability of observing the macro-event becomes:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AP(n_1,%20n_2,%20%5Cdots,%20n_M)%20=%20W%20%5Cprod_%7Bi=1%7D%5E%7BM%7D%20(q_i)%5E%7Bn_i%7D%0A"></p>
+<p>If we take the logarithm of this new non-uniform probability, divide by <img src="https://latex.codecogs.com/png.latex?N">, and apply the exact same Stirling approximation logic as before, the derivation yields:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7B1%7D%7BN%7D%20%5Clog%20P(n_1,%20n_2,%20%5Cdots,%20n_M)%20%5Capprox%20-%5Csum_%7Bi=1%7D%5E%7BM%7D%20p_i%20%5Clog%5Cleft(%5Cfrac%7Bp_i%7D%7Bq_i%7D%5Cright)%0A"> The right-hand side is instantly recognizable—it is precisely the negative Kullback-Leibler (KL) divergence, <img src="https://latex.codecogs.com/png.latex?-D_%7B%5Cmathrm%7BKL%7D%7D(p%20%5Cparallel%20q)">.</p>
+<p>We recognize the right-hand side as exactly the negative of the KL divergence, (-D_{}(p | q)).</p>
+<p>The Takeaway: In the macroscopic limit, the logarithm of the probability of observing a specific macrostate is exactly the negative KL divergence between the observed distribution <img src="https://latex.codecogs.com/png.latex?p"> and the prior distribution <img src="https://latex.codecogs.com/png.latex?q">.</p>
+<p><strong>Bringing It Back to Machine Learning:</strong> This brings our story full circle. When we train a machine learning model by minimizing <img src="https://latex.codecogs.com/png.latex?D_%7B%5Cmathrm%7BKL%7D%7D(p%20%5Cparallel%20q)">, the underlying physical interpretation is identical. By optimizing the model parameters <img src="https://latex.codecogs.com/png.latex?q">, we are actively transforming the probability of observing our training data <img src="https://latex.codecogs.com/png.latex?p"> from an “extremely unlikely, rare outlier” into the “most natural, highest-probability typical event.”</p>
+<p>This foundational logic governs variational inference, knowledge distillation, and policy constraints in reinforcement learning. It also explains why physicists without formal AI backgrounds often make rapid, groundbreaking contributions to machine learning—beneath the code and the compute, the two domains speak the exact same language at their core.</p>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>Since C. E. Shannon proposed the mathematical formulation of information entropy in 1948, this theoretical framework for quantifying uncertainty has laid the bedrock for information theory and statistical learning, continuously shaping the landscape of modern AI and ML.</p>
+<p>From the basic cognitive bias in weather forecasting to the cross-entropy loss that guides parameter updates in deep learning; from probability approximations in VAEs and distribution matching in knowledge distillation, to KL divergence regularization used to constrain LLMs<span class="citation" data-cites="ouyang2022training">(<span class="nocase">Ouyang et al.</span> 2022)</span> and RL training—the “information cost” metric system built on entropy, cross-entropy, and KL divergence is more than just the underlying grammar of ML algorithms. It has become our core analytical tool for understanding and navigating a world of uncertainty.</p>
+<p>Mastering this framework not only clarifies “what is being calculated” during model optimization, but more importantly, uncovers the fundamental logic of “why it is calculated this way.”</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-haarnoja2018soft" class="csl-entry">
+Haarnoja, Tuomas, Aurick Zhou, Pieter Abbeel, and Sergey Levine. 2018. <span>“Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor.”</span> <em>International Conference on Machine Learning</em>, 1861–70.
+</div>
+<div id="ref-hinton2015distilling" class="csl-entry">
+Hinton, Geoffrey, Oriol Vinyals, and Jeff Dean. 2015. <span>“Distilling the Knowledge in a Neural Network.”</span> <em>arXiv Preprint arXiv:1503.02531</em>.
+</div>
+<div id="ref-kingma2013auto" class="csl-entry">
+Kingma, Diederik P, and Max Welling. 2013. <span>“Auto-Encoding Variational Bayes.”</span> <em>arXiv Preprint arXiv:1312.6114</em>.
+</div>
+<div id="ref-kullback1951information" class="csl-entry">
+Kullback, Solomon, and Richard A Leibler. 1951. <span>“On Information and Sufficiency.”</span> <em>The Annals of Mathematical Statistics</em> 22 (1): 79–86.
+</div>
+<div id="ref-ouyang2022training" class="csl-entry">
+<span class="nocase">Ouyang, Long, Jeffrey Wu, Xu Jiang, et al.</span> 2022. <span>“Training Language Models to Follow Instructions with Human Feedback.”</span> <em>Advances in Neural Information Processing Systems</em> 35: 27730–44.
+</div>
+<div id="ref-schulman2017proximal" class="csl-entry">
+Schulman, John, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. <span>“Proximal Policy Optimization Algorithms.”</span> <em>arXiv Preprint arXiv:1707.06347</em>.
+</div>
+<div id="ref-shannon1948mathematical" class="csl-entry">
+Shannon, Claude Elwood. 1948. <span>“A Mathematical Theory of Communication.”</span> <em>The Bell System Technical Journal</em> 27 (3): 379–423.
+</div>
+</div></section></div> ]]></description>
+  <category>LLMs</category>
+  <category>Information theory</category>
+  <category>Reinforcement Learning</category>
+  <guid>https://tokenTideAI.github.io/posts/01_info_theory.html</guid>
+  <pubDate>Wed, 10 Jun 2026 16:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

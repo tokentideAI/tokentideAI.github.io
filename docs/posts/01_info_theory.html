@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Yitian Chen">
+<meta name="dcterms.date" content="2026-06-11">
+
+<title>Information Theory in Language Models (Part 1): Entropy, Cross-Entropy, and KL Divergence – TokenTide AI</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-0883b3f2169e153c5a396c0068902256.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-1d5a6e1eb4a0b3ea080dce93fb43051f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-0883b3f2169e153c5a396c0068902256.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-d1f7c28fd5283ca5a4b70c37ef98d8a8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-8008cc9fa29fea96039a2fe68f20525f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-d1f7c28fd5283ca5a4b70c37ef98d8a8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">TokenTide AI</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../posts/01_info_theory.html" aria-current="page"> 
+<span class="menu-text">Post</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Information Theory in Language Models (Part 1): Entropy, Cross-Entropy, and KL Divergence</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">LLMs</div>
+    <div class="quarto-category">Information theory</div>
+    <div class="quarto-category">Reinforcement Learning</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Yitian Chen </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 11, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="self-information" class="level3">
+<h3 class="anchored" data-anchor-id="self-information">Self-Information</h3>
+<p>Information theory <span class="citation" data-cites="shannon1948mathematical">(<a href="#ref-shannon1948mathematical" role="doc-biblioref">Shannon 1948</a>)</span> provides a rigorous mathematical framework for quantifying “information” and “uncertainty.”</p>
+<p>Every event carries a certain amount of information. For a random event, its information content can be intuitively understood as the “degree of surprise”: the lower the prior probability of an event, the more information it conveys when it actually occurs. Take weather as an example: * “It rained yesterday” is an established fact with zero surprise, so it contains zero information. * However, “it will rain tomorrow” remains uncertain, so when it happens, it carries actual information.</p>
+<p>Imagine you are hiking deep in the mountains with absolutely no cell phone signal. You know nothing about tomorrow’s cloud cover, humidity, atmospheric pressure, or any other physical conditions. In such a state of extreme cognitive deprivation, the most conservative inference you can make, is that that the probabilities of tomorrow being sunny, cloudy, or rainy are evenly split at 1/3 each, based on the principle of symmetry. This reflects a severe lack of knowledge regarding the weather system’s underlying laws—to you, the system’s <strong>uncertainty is immense</strong>.</p>
+<p>In contrast, if you check an authoritative weather forecast today and learn that the probability of a sunny day tomorrow is 0.99. Where does such high certainty come from? In fact, a massive amount of information has already been injected into the forecasting system in advance. Meteorologists have digested the original uncertainty using satellite images, historical weather models, and supercomputer simulations. Achieving such high certainty means that, during this prediction process, physical determinism has overwhelmingly outweighed randomness. From this we can draw a rather philosophical conclusion:</p>
+<p><strong>Information is essentially the reduction in uncertainty from learning an outcome.</strong></p>
+<p>To quantify how much uncertainty has been reduced, we need a metrics to measure the uncertainty. This leads to the mathematical definition of information. For a random variable (X) defined on a discrete outcome space () with probability mass function (p(x)), the amount of information gained by observing the event (X=x), the <strong>self-information</strong>,is defined as:</p>
+<p><span class="math display">\[
+I(X=x) = -\log p(x)
+\]</span></p>
+<p>The base of the logarithm is usuall 2 (unit: bit) or base (e) (unit: nat). (I(x)) measures the “amount of information” obtained when we observe a specific outcome (x). Returning to the weather example:</p>
+<ul>
+<li>Example 1: If “it rained yesterday” is a certain fact, <span class="math inline">\(p(x=\text{rainy}) = 1\)</span>, then <span class="math inline">\(I(x) = -\ln(1) = 0\)</span>. A certain event contains no information.</li>
+<li>Example 2: Suppose a weather station predicts that the prior probability of rain tomorrow is <span class="math inline">\(p(x=\text{rainy}) = 0.1\)</span>. Then the self-information of the event “it rains tomorrow” is <span class="math inline">\(I(X=\text{rainy}) = -\ln(0.1) \approx 2.3\)</span> nats. This means that if it actually rains tomorrow, we will receive about 2.3 nats of “information” or “surprise.”</li>
+</ul>
+</section>
+<section id="shannon-entropy" class="level3">
+<h3 class="anchored" data-anchor-id="shannon-entropy">Shannon Entropy</h3>
+<p>Using the weather example, if the probability of rain is <span class="math inline">\(p(x)\)</span>, the information content of the event “rain tomorrow” is <span class="math inline">\(-\log(p(x))\)</span>. If we enumerate all possible outcomes (rainy, cloudy, sunny) and compute the expectation of their information contents. This expectation is what we call <strong>entropy</strong>.</p>
+<p>Mathematically, suppose an event (X) (such as tomorrow’s weather) has <span class="math inline">\(n\)</span> possible outcomes with respective probabilities <span class="math inline">\(p(x_i)\)</span>. The expected information, or entropy, is expressed as:</p>
+<p><span class="math display">\[
+H(X) = \mathbb{E}_{x \sim p}[I(x)] = -\sum_{i=1}^{n} p(x_i) \log p(x_i) \quad \text{(Discrete case)}
+\]</span></p>
+<p>The higher the entropy, the greater the system’s uncertainty. For instance, if the probabilities of tomorrow’s weather are: <span class="math display">\[p(x_1=\text{rainy}) = 0.1,\; p(x_2=\text{cloudy}) = 0.3,\; p(x_3=\text{sunny}) = 0.6\.\]</span></p>
+<p>The entropy is: <span class="math display">\[
+H(X) = -0.1 \ln(0.1) - 0.3 \ln(0.3) - 0.6 \ln(0.6) \approx 0.898 \text{ nats}
+\]</span></p>
+<p>This value (approximate 0.898 nats) represents our measure of the average uncertainty regarding tomorrow’s weather.</p>
+</section>
+<section id="cross-entropy" class="level3">
+<h3 class="anchored" data-anchor-id="cross-entropy">Cross Entropy</h3>
+<p>In reality, we rarely know the true distribution <span class="math inline">\(p\)</span>; instead, we have a predicted distribution <span class="math inline">\(q\)</span>. For instance, we might rely on a weather app to predict tomorrow’s weather, but that prediction isn’t necessarily perfect. We can use <strong>cross-entropy</strong> <span class="math inline">\(H(p, q)\)</span> to define the measurement cost required when we use a suboptimal predicted distribution <span class="math inline">\(q\)</span> to represent the average information from the true distribution <span class="math inline">\(p\)</span>: <span class="math display">\[
+H(p, q) = \mathbb{E}_{x \sim p(x)}[-\log q(x)] = -\sum_{x} p(x) \log q(x)
+\]</span> Note that the expectation is taken with respect to the true distribution <span class="math inline">\(p\)</span>, but the log probabilities come from the predictive model distribution <span class="math inline">\(q\)</span>.</p>
+<p>Let’s go back to the weather forecast example we looked at earlier. Suppose the true probabilities of sunny, cloudy, and rainy are <span class="math inline">\(p = \{0.1, 0.3, 0.6\}\)</span>. First, we calculate the entropy of the true distribution itself, which is the minimum average information required under optimal encoding (using base <span class="math inline">\(e\)</span>, unit: nats):</p>
+<p><span class="math display">\[
+H(p) = -\sum_{x} p(x) \log p(x) = -(0.1\ln0.1 + 0.3\ln0.3 + 0.6\ln0.6) \approx 0.898
+\]</span> Now, suppose two weather apps provide different predicted distributions for tomorrow:</p>
+<ul>
+<li>Model A (More accurate): <span class="math inline">\(q_A = \{0.15, 0.25, 0.60\}\)</span></li>
+<li>Model B (Less accurate): <span class="math inline">\(q_B = \{0.70, 0.20, 0.10\}\)</span></li>
+</ul>
+<p>We can calculate the cross-entropy of these two predictions relative to the true distribution:</p>
+<ul>
+<li>Cross-entropy of Model A: <span class="math inline">\(H(p,q_A) = -(0.1\ln0.15 + 0.3\ln0.25 + 0.6\ln0.60) \approx 0.912\)</span></li>
+<li>Cross-entropy of Model B: <span class="math inline">\(H(p,q_B) = -(0.1\ln0.70 + 0.3\ln0.20 + 0.6\ln0.10) \approx 1.901\)</span></li>
+</ul>
+<p>As we can see, Model A’s cross-entropy (0.912) is much closer to the true entropy (0.897). A lower cross-entropy indicates that the predicted distribution is closer to the true distribution.</p>
+<p>By generalizing the weather classification example, we arrive at the cross-entropy loss function—the workhorse behind most machine learning classifiers. When we train deep neural networks for tasks like image classification or language modeling, the central goal is to minimize this cross-entropy loss via backpropagation. In doing so, we drive the model’s predicted distribution qq to match the true label distribution pp as closely as possible.</p>
+</section>
+<section id="kl-divergence" class="level3">
+<h3 class="anchored" data-anchor-id="kl-divergence">KL Divergence</h3>
+<p>In the weather prediction example above, a good prediction model (Model A) is clearly superior to a poor one (Model B). But what if we want to further quantify exactly how much extra information cost (i.e., cognitive bias or prediction error) we paid because the predicted distribution <span class="math inline">\(q\)</span> is inaccurate compared to the ideal state <span class="math inline">\(p\)</span>? This is exactly what KL Divergence answers <span class="citation" data-cites="kullback1951information">(<a href="#ref-kullback1951information" role="doc-biblioref">Kullback and Leibler 1951</a>)</span>.</p>
+<p>In information theory, there is a classic information cost decomposition:</p>
+<p><span class="math display">\[
+\underbrace{H(p, q)}_{\text{Total predictive cost}} = \underbrace{H(p)}_{\text{Inherent randomness (minimum possible cost)}} + \underbrace{D_{\mathrm{KL}}(p \| q)}_{\text{Extra cost due to model inaccuracy}}
+\]</span></p>
+<p>Intuitively:</p>
+<ol type="1">
+<li><span class="math inline">\(H(p)\)</span> (entropy): this is the intrinsic physical noise of the world. Even if your model were omniscient, this part of uncertainty could never be eliminated.</li>
+<li><span class="math inline">\(D_{\mathrm{KL}}(p \| q)\)</span> (KL divergence): this is the “cognitive gap” between you and the real world. It measures the “distance” (asymmetric) between two probability distributions. the information redundancy or extra waste caused by the model’s imperfection.</li>
+</ol>
+<p>We can then derive the formula of KL divergence:</p>
+<p><span class="math display">\[
+D_{\mathrm{KL}}(p \| q) = H(p, q) - H(p) = \sum_{i=1}^{n} p(x_i) \log\left(\frac{p(x_i)}{q(x_i)}\right)
+\]</span></p>
+<p>Using our running example, the true distribution <span class="math inline">\(p=\{0.1, 0.3, 0.6\}\)</span> has an entropy <span class="math inline">\(H(p) \approx 0.897\)</span> nats.</p>
+<p>Model A (More accurate):</p>
+<ul>
+<li>Prediction: <span class="math inline">\(q_A = \{0.15, 0.25, 0.60\}\)</span></li>
+<li>Cross-Entropy: <span class="math inline">\(H(p, q_A) \approx 0.912\)</span> nats</li>
+<li>KL Divergence: <span class="math inline">\(D_{KL}(p \parallel q_A) = 0.912 - 0.897 = 0.015\)</span> nats</li>
+<li>Analysis: Information redundancy is extremely small (near 0), indicating Model A’s predictive efficiency is very close to the theoretical optimum.</li>
+</ul>
+<p>Model B (Less accurate):</p>
+<ul>
+<li>Prediction: <span class="math inline">\(q_B = \{0.70, 0.20, 0.10\}\)</span></li>
+<li>Cross-Entropy: <span class="math inline">\(H(p, q_B) \approx 1.901\)</span> nats</li>
+<li>KL Divergence: <span class="math inline">\(D_{KL}(p \parallel q_B) = 1.901 - 0.897 = 1.004\)</span> nats</li>
+<li>Analysis: Huge information redundancy. This means due to Model B’s severe bias, every time it encodes weather information, it wastes over 1 nat of information just dealing with its own errors.</li>
+</ul>
+<p>KL Divergence has two classic properties:</p>
+<ol type="1">
+<li>: <span class="math inline">\(D_{KL}(p \parallel q) \neq D_{KL}(q \parallel p)\)</span>. KL divergence is not a true geometric “distance metric” (which requires symmetry). It measures the information lost when using <span class="math inline">\(q\)</span> to approximate <span class="math inline">\(p\)</span>, taking <span class="math inline">\(p\)</span> as the baseline.</li>
+<li>Non-negativity: <span class="math inline">\(D_{KL}(p \parallel q) \ge 0\)</span>. According to Jensen’s inequality, the divergence is 0 if and only if <span class="math inline">\(p=q\)</span>. This reflects a common-sense principle in information theory: no predictive encoding can be better than the true distribution itself. Any imperfect model will inevitably incur extra information costs.</li>
+</ol>
+</section>
+<section id="beyond-weather-forecasting-applications-in-machine-learning" class="level3">
+<h3 class="anchored" data-anchor-id="beyond-weather-forecasting-applications-in-machine-learning">Beyond Weather Forecasting: Applications in Machine Learning</h3>
+<p>The principles of entropy, cross-entropy, and KL divergence form a powerful “information-cost” framework that naturally extends into the core of modern machine learning, deep learning, and reinforcement learning.</p>
+<p><strong>Supervised Learning:</strong> In classic single-label classification, the ground-truth label is typically represented as a one-hot vector. For the correct class <span class="math inline">\(y^*\)</span>, the true probability is <span class="math inline">\(P(y^*|x) = 1\)</span> and zero for all other classes, resulting in a true distribution entropy of <span class="math inline">\(H(P) = 0\)</span>. Consequently, the cross-entropy loss used to train classifiers reduces entirely to the negative log-likelihood:</p>
+<p><span class="math display">\[
+\mathcal{L}_{\mathrm{CE}} = H(P, Q) = -\sum_{y} P(y|x) \log Q(y|x) = -\log Q(y^*|x).
+\]</span></p>
+<p>Because the inherent entropy <span class="math inline">\(H(P) = 0\)</span>, minimizing the cross-entropy is mathematically equivalent to minimizing the KL divergence <span class="math inline">\(D_{\mathrm{KL}}(P \parallel Q)\)</span>—essentially forcing the model’s predicted distribution <span class="math inline">\(Q\)</span> to map perfectly to the true distribution <span class="math inline">\(P\)</span>.</p>
+<p><strong>Generative Models:</strong> In generative models like Variational Autoencoders (VAEs) <span class="citation" data-cites="kingma2013auto">(<a href="#ref-kingma2013auto" role="doc-biblioref">Kingma and Welling 2013</a>)</span>, KL divergence acts directly as an optimization objective to regularize the latent variable distribution. VAEs are trained by maximizing the Evidence Lower Bound (ELBO), formulated as: <span class="math display">\[
+\mathrm{ELBO} = \mathbb{E}_{z \sim Q_\phi(z|x)}[\log P_\theta(x|z)] - \beta \cdot D_{\mathrm{KL}}(Q_\phi(z|x) \| P(z)).
+\]</span> The corresponding minimization loss is (_{} = -).</p>
+<p>To reframe this as a minimization problem, the loss function becomes <span class="math inline">\(\mathcal{L}_{\mathrm{VAE}} = -\mathrm{ELBO}\)</span>, which balances two critical components:</p>
+<ul>
+<li>The Reconstruction Term: <span class="math inline">\(\mathbb{E}[\log P_\theta(x|z)]\)</span> ensures the decoder can accurately reconstruct the real data <span class="math inline">\(x\)</span> from the latent variable <span class="math inline">\(z\)</span> (typically measured via mean squared error or cross-entropy).</li>
+<li>The Regularization Term: <span class="math inline">\(D_{\mathrm{KL}}(Q_\phi(z|x) \parallel P(z))\)</span> forces the encoder’s output posterior distribution <span class="math inline">\(Q_\phi(z|x)\)</span> to approximate a defined prior <span class="math inline">\(P(z)\)</span> (such as a standard normal distribution <span class="math inline">\(\mathcal{N}(0, I)\)</span>).</li>
+</ul>
+<p><strong>Knowledge Distillation: </strong> Knowledge distillation<span class="citation" data-cites="hinton2015distilling">(<a href="#ref-hinton2015distilling" role="doc-biblioref">Hinton et al. 2015</a>)</span> aims to transfer the rich representations embedded in a large “teacher model” (such as DeepSeek, GPT, or Gemini) into a lightweight “student model.” To ensure the student learns not only the hard labels (0/1) but also the nuanced inter-class similarities discovered by the teacher, we introduce KL divergence to align their soft labels:</p>
+<p><span class="math display">\[
+\mathcal{L}_{\mathrm{KD}} = \alpha \cdot \mathcal{L}_{\mathrm{CE}}(y, q_s) + (1-\alpha) \cdot T^2 \cdot D_{\mathrm{KL}}(p_t \| p_s),
+\]</span> where the teacher’s and student’s smoothed probabilities at temperature <span class="math inline">\(T\)</span> are defined as: <span class="math display">\[
+p_t = \mathrm{softmax}\!\left(\frac{z_t}{T}\right), \quad p_s = \mathrm{softmax}\!\left(\frac{z_s}{T}\right).
+\]</span></p>
+<p>A higher temperature <span class="math inline">\(T\)</span> yields a smoother distribution that reveals hidden inter-class relationships, while multiplying the term by <span class="math inline">\(T^2\)</span> preserves the original gradient scale of the soft-label loss. By minimizing <span class="math inline">\(D_{\mathrm{KL}}(p_t \parallel p_s)\)</span>, the student model is forced to replicate the teacher’s reasoning logic and predictive confidence. This yields a significantly stronger generalization capability than could be achieved by fitting hard labels alone.</p>
+<p><strong>Reinforcement Learning: </strong> In reinforcement learning (RL), KL divergence and entropy play distinct but equally critical roles in stabilizing training and promoting exploration.</p>
+<ul>
+<li><p><strong>KL divergence for constraining policy updates:</strong> In the clipped version of Proximal Policy Optimization (PPO) <span class="citation" data-cites="schulman2017proximal">(<a href="#ref-schulman2017proximal" role="doc-biblioref">Schulman et al. 2017</a>)</span>, the objective function is: <span class="math display">\[
+  \mathcal{L}^{\mathrm{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ \min\left( r_t(\theta) \hat{A}_t,\; \mathrm{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_t \right) \right],
+  \]</span> where <span class="math inline">\(r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{\mathrm{old}}}(a_t|s_t)}\)</span>. By restricting the probability ratio <span class="math inline">\(r_t(\theta)\)</span> to the interval <span class="math inline">\([1-\epsilon, 1+\epsilon]\)</span>, the clipping operation implicitly bounds the KL divergence <span class="math inline">\(D_{\mathrm{KL}}(\pi_{\theta_{\mathrm{old}}} \parallel \pi_\theta)\)</span>. This prevents drastic, destructive policy updates and ensures monotonic training stability.</p></li>
+<li><p><strong>Entropy for encouraging exploration:</strong> To prevent a policy from prematurely converging to a deterministic, suboptimal solution, many policy gradient methods incorporate an entropy regularization term into the loss:</p>
+<p><span class="math display">\[
+  \mathcal{L} = \mathbb{E}_t\left[ \log \pi_\theta(a_t|s_t) \hat{A}_t \right] + \beta \cdot H(\pi_\theta(\cdot|s_t)),
+\]</span></p></li>
+</ul>
+<p>Soft Actor-Critic (SAC) <span class="citation" data-cites="haarnoja2018soft">(<a href="#ref-haarnoja2018soft" role="doc-biblioref">Haarnoja et al. 2018</a>)</span> advances this concept by establishing a formal “maximum entropy” RL framework. SAC maximizes a weighted sum of the expected return and the policy’s entropy by optimizing the following objective:<span class="math display">\[J(\pi) = \sum_t \mathbb{E}_{(s_t, a_t)} \left[ r(s_t, a_t) + \alpha H(\pi(\cdot|s_t)) \right].\]</span>This formulation structurally guarantees a superior balance between exploration and exploitation, leading to more robust policies with enhanced generalization across varied environments.</p>
+</section>
+<section id="the-physical-roots-thermodynamics-and-statistical-mechanics" class="level3">
+<h3 class="anchored" data-anchor-id="the-physical-roots-thermodynamics-and-statistical-mechanics">The Physical Roots: Thermodynamics and Statistical Mechanics</h3>
+<p>Before wrapping up, let us revisit the origins of entropy and KL divergence in their birthplace: thermodynamics and statistical physics.</p>
+<p><strong>The Physical picture: particles and energy levels: </strong> Imagine randomly throwing <span class="math inline">\(N\)</span> small stones (analogous to independent particles) into <span class="math inline">\(M\)</span> buckets (analogous to energy levels). The bucket each stone lands in is random, ultimately yielding an observed distribution where <span class="math inline">\(n_i\)</span> is the number of stones in bucket <span class="math inline">\(i\)</span>. This process naturally generates a probability distribution where the proportion of stones in each bucket is <span class="math inline">\(p_i = n_i / N\)</span>.</p>
+<p>Suppose we only care about the final macrostate—how many stones end up in each bucket, regardless of which specific stone went where. We describe this macrostate using a vector <span class="math inline">\(\mathbf{n} = \{n_1, n_2, \dots, n_M\}\)</span> under the strict constraint that <span class="math inline">\(\sum n_i = N\)</span>. The question then becomes: How many microscopic arrangements (microstates) lead to this exact macrostate?</p>
+<p>The first stone has <span class="math inline">\(N\)</span> possible placements, the second <span class="math inline">\(N-1\)</span>, and so on, giving <span class="math inline">\(N!\)</span> total permutations. However, because we do not care about the ordering of stones within the same bucket, we must divide out the redundant permutations by taking the factorial of each bucket’s occupation number. This gives us the total number of microstates (the multinomial coefficient) behind the macrostate:</p>
+<p><span class="math display">\[W = \frac{N!}{\prod_{i=1}^{M} n_i!}\]</span></p>
+<p>In physics, <span class="math inline">\(W\)</span> is known as the multiplicity. Ludwig Boltzmann famously proposed that the physical entropy of a system is proportional to the logarithm of its multiplicity. Therefore, we can define the physical entropy per particle as:</p>
+<p>If we further assume that each bucket has an equal prior probability (i.e., a uniform distribution with probability (1/M)), then the total probability of observing the macrostate () follows a standard multinomial distribution:</p>
+<p><span class="math display">\[H = \frac{1}{N} \log W\]</span></p>
+<p>If we assume each bucket has an equal prior probability of catching a stone (a uniform distribution with probability <span class="math inline">\(1/M\)</span>), the total probability of observing the macrostate <span class="math inline">\(\mathbf{n}\)</span> follows a standard multinomial distribution:</p>
+<p><span class="math display">\[P(n_1, n_2, \dots, n_M) = W \cdot \left(\frac{1}{M}\right)^N\]</span></p>
+<p>Taking the logarithm of this probability and dividing by <span class="math inline">\(N\)</span>, we obtain:</p>
+<p><span class="math display">\[\frac{1}{N} \log P = \frac{1}{N} \log W + \log\!\left(\frac{1}{M}\right)\]</span></p>
+<p>Because the second term is a fixed constant, we uncover a profound physical truth: finding the macrostate with the largest multiplicity <span class="math inline">\(W\)</span> is mathematically equivalent to finding the state with the highest probability of occurring.</p>
+<p><strong>Uniform distribution to Shannon entropy: </strong> Now, let’s explore what happens in the macroscopic limit as <span class="math inline">\(N \to \infty\)</span>, while keeping the bucket ratios <span class="math inline">\(p_i = n_i/N\)</span> fixed. Expanding our entropy equation <span class="math inline">\(H\)</span>:</p>
+<p><span class="math display">\[H = \frac{1}{N} \log(N!) - \frac{1}{N} \sum_{i=1}^{M} \log(n_i!)\]</span></p>
+<p>By applying Stirling’s approximation (<span class="math inline">\(\log(x!) \approx x \log x - x\)</span>) for large numbers, the equation transforms into:</p>
+<p><span class="math display">\[
+H \approx \frac{1}{N} \left( N \log N - N - \sum_{i=1}^{M} (n_i \log n_i - n_i) \right)
+\]</span></p>
+<p>Given our constraint that <span class="math inline">\(\sum n_i = N\)</span>, the linear <span class="math inline">\(N\)</span> terms cancel out, simplifying the expression to:</p>
+<p><span class="math display">\[
+H \approx \log N - \frac{1}{N} \sum_{i=1}^{M} n_i \log n_i
+\]</span></p>
+<p>Next, we substitute <span class="math inline">\(n_i = N p_i\)</span> back into the sum:</p>
+<p><span class="math display">\[\begin{aligned}
+H &amp;\approx \log N - \frac{1}{N} \sum_{i=1}^{M} (N p_i \log (N p_i)) \\
+&amp;= \log N - \sum_{i=1}^{M} p_i (\log N + \log p_i) \\
+&amp;= \log N - (\log N) \sum_{i=1}^{M} p_i - \sum_{i=1}^{M} p_i \log p_i
+\end{aligned}\]</span></p>
+<p>Because the probabilities must sum to one (<span class="math inline">\(\sum p_i = 1\)</span>), the <span class="math inline">\(\log N\)</span> terms beautifully cancel each other out. Out of a classical physics thought experiment, we arrive directly at the formula for Shannon Information Entropy:</p>
+<p><span class="math display">\[H = -\sum_{i=1}^{M} p_i \log p_i\]</span></p>
+<p><strong>From Non-uniform distribution to KL divergence:</strong> Now consider a twist: what if the inherent probabilities of a stone falling into each bucket are not equal? What if they follow a non-uniform prior distribution <span class="math inline">\(q = \{q_1, q_2, \dots, q_M\}\)</span> dictated by natural laws or environmental biases? In this scenario, the total probability of observing the macro-event becomes:</p>
+<p><span class="math display">\[
+P(n_1, n_2, \dots, n_M) = W \prod_{i=1}^{M} (q_i)^{n_i}
+\]</span></p>
+<p>If we take the logarithm of this new non-uniform probability, divide by <span class="math inline">\(N\)</span>, and apply the exact same Stirling approximation logic as before, the derivation yields:</p>
+<p><span class="math display">\[
+\frac{1}{N} \log P(n_1, n_2, \dots, n_M) \approx -\sum_{i=1}^{M} p_i \log\left(\frac{p_i}{q_i}\right)
+\]</span> The right-hand side is instantly recognizable—it is precisely the negative Kullback-Leibler (KL) divergence, <span class="math inline">\(-D_{\mathrm{KL}}(p \parallel q)\)</span>.</p>
+<p>We recognize the right-hand side as exactly the negative of the KL divergence, (-D_{}(p | q)).</p>
+<p>The Takeaway: In the macroscopic limit, the logarithm of the probability of observing a specific macrostate is exactly the negative KL divergence between the observed distribution <span class="math inline">\(p\)</span> and the prior distribution <span class="math inline">\(q\)</span>.</p>
+<p><strong>Bringing It Back to Machine Learning:</strong> This brings our story full circle. When we train a machine learning model by minimizing <span class="math inline">\(D_{\mathrm{KL}}(p \parallel q)\)</span>, the underlying physical interpretation is identical. By optimizing the model parameters <span class="math inline">\(q\)</span>, we are actively transforming the probability of observing our training data <span class="math inline">\(p\)</span> from an “extremely unlikely, rare outlier” into the “most natural, highest-probability typical event.”</p>
+<p>This foundational logic governs variational inference, knowledge distillation, and policy constraints in reinforcement learning. It also explains why physicists without formal AI backgrounds often make rapid, groundbreaking contributions to machine learning—beneath the code and the compute, the two domains speak the exact same language at their core.</p>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>Since C. E. Shannon proposed the mathematical formulation of information entropy in 1948, this theoretical framework for quantifying uncertainty has laid the bedrock for information theory and statistical learning, continuously shaping the landscape of modern AI and ML.</p>
+<p>From the basic cognitive bias in weather forecasting to the cross-entropy loss that guides parameter updates in deep learning; from probability approximations in VAEs and distribution matching in knowledge distillation, to KL divergence regularization used to constrain LLMs<span class="citation" data-cites="ouyang2022training">(<a href="#ref-ouyang2022training" role="doc-biblioref"><span class="nocase">Ouyang et al.</span> 2022</a>)</span> and RL training—the “information cost” metric system built on entropy, cross-entropy, and KL divergence is more than just the underlying grammar of ML algorithms. It has become our core analytical tool for understanding and navigating a world of uncertainty.</p>
+<p>Mastering this framework not only clarifies “what is being calculated” during model optimization, but more importantly, uncovers the fundamental logic of “why it is calculated this way.”</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-haarnoja2018soft" class="csl-entry" role="listitem">
+Haarnoja, Tuomas, Aurick Zhou, Pieter Abbeel, and Sergey Levine. 2018. <span>“Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor.”</span> <em>International Conference on Machine Learning</em>, 1861–70.
+</div>
+<div id="ref-hinton2015distilling" class="csl-entry" role="listitem">
+Hinton, Geoffrey, Oriol Vinyals, and Jeff Dean. 2015. <span>“Distilling the Knowledge in a Neural Network.”</span> <em>arXiv Preprint arXiv:1503.02531</em>.
+</div>
+<div id="ref-kingma2013auto" class="csl-entry" role="listitem">
+Kingma, Diederik P, and Max Welling. 2013. <span>“Auto-Encoding Variational Bayes.”</span> <em>arXiv Preprint arXiv:1312.6114</em>.
+</div>
+<div id="ref-kullback1951information" class="csl-entry" role="listitem">
+Kullback, Solomon, and Richard A Leibler. 1951. <span>“On Information and Sufficiency.”</span> <em>The Annals of Mathematical Statistics</em> 22 (1): 79–86.
+</div>
+<div id="ref-ouyang2022training" class="csl-entry" role="listitem">
+<span class="nocase">Ouyang, Long, Jeffrey Wu, Xu Jiang, et al.</span> 2022. <span>“Training Language Models to Follow Instructions with Human Feedback.”</span> <em>Advances in Neural Information Processing Systems</em> 35: 27730–44.
+</div>
+<div id="ref-schulman2017proximal" class="csl-entry" role="listitem">
+Schulman, John, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. <span>“Proximal Policy Optimization Algorithms.”</span> <em>arXiv Preprint arXiv:1707.06347</em>.
+</div>
+<div id="ref-shannon1948mathematical" class="csl-entry" role="listitem">
+Shannon, Claude Elwood. 1948. <span>“A Mathematical Theory of Communication.”</span> <em>The Bell System Technical Journal</em> 27 (3): 379–423.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tokenTideAI\.github\.io\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Yitian Chen</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Powered by Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
