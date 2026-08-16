@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Yitian Chen, Yanguang Chen, Siyu Shao">
-<meta name="dcterms.date" content="2026-07-26">
+<meta name="dcterms.date" content="2026-08-16">
 
 <title>Harness Engineering for Optimization Modeling: Strategy, Implementation, and Expansion – TokenTide AI</title>
 <style>
@@ -392,7 +392,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 26, 2026</p>
+      <p class="date">August 16, 2026</p>
     </div>
   </div>
   
@@ -516,7 +516,7 @@ AI\text{-}Agent = \underbrace{\text{SOTA Model}}_{\text{the wild horse}}
 <div id="fig-example" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="../cytTechBlog/figs/optharness/diagram.jpg" class="img-fluid figure-img">
+<img src="../figs/optharness/diagram.jpg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: SIRL RLVR diagram
@@ -536,6 +536,7 @@ Figure&nbsp;1: SIRL RLVR diagram
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the complete constraint matrix A (returns scipy.sparse.csr_matrix)</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># This allows us to detect if the LLM's formulation inadvertently caused a highly dense or ill-conditioned matrix</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> m.getA()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Here we retrieve the constraint matrix A as a scipy.sparse.csr_matrix, which iis Useful for evaluating sparse structure density and condition metrics.</p>
 <ol start="2" type="1">
 <li>Root Cause Analysis (RCA) for Infeasibility:</li>
 </ol>
@@ -544,32 +545,23 @@ Figure&nbsp;1: SIRL RLVR diagram
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    m.computeIIS()</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Precisely isolate the fragment of conflicting constraints for the LLM to debug</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    m.write(<span class="st">"conflict_model.ilp"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>When an LLM produces contradictory constraints, runtime error messages are often insufficient. We can instruct the solver to compute an Irreducible Inconsistent Subsystem (IIS) to isolate the conflict.</p>
 <ol start="3" type="1">
 <li>Probe C: Economic Signals and Sensitivity Analysis:</li>
 </ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> m.Status <span class="op">==</span> GRB.INFEASIBLE:</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the Irreducible Inconsistent Subsystem (IIS)</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    m.computeIIS()</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Precisely isolate the fragment of conflicting constraints for the LLM to debug</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    m.write(<span class="st">"conflict_model.ilp"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get shadow prices for all constraints</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pi_vals <span class="op">=</span> m.getAttr(<span class="st">'Pi'</span>, m.getConstrs())</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get reduced costs for all decision variables</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>rc_vals <span class="op">=</span> m.getAttr(<span class="st">'RC'</span>, m.getVars())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sensitivity Analysis &amp; Economic SignalsFor linear programming tasks, dual metrics provide direct operational signals beyond primal decision variable value. By pairing solver backends with an IR-injection Harness engine, we establish a robust interface between probabilistic language models and deterministic mathematical solvers—enabling scalable RL training and dependable real-world deployments.</p>
 </section>
 </section>
-<section id="retrieve-the-constraint-matrix-a-as-a-scipy.sparse.csr_matrix" class="level1">
-<h1>Retrieve the constraint matrix A as a scipy.sparse.csr_matrix</h1>
-</section>
-<section id="useful-for-evaluating-sparse-structure-density-and-condition-metrics" class="level1">
-<h1>Useful for evaluating sparse structure density and condition metrics</h1>
-<p>A = m.getA() 2. Infeasibility Root-Cause IsolationWhen an LLM produces contradictory constraints, runtime error messages are often insufficient. We can instruct the solver to compute an Irreducible Inconsistent Subsystem (IIS) to isolate the conflict:Pythonif m.Status == GRB.INFEASIBLE: # Compute Irreducible Inconsistent Subsystem (IIS) m.computeIIS() # Export minimal conflicting constraint subset for reflection m.write(“conflict_model.ilp”) 3. Sensitivity Analysis &amp; Economic SignalsFor linear programming tasks, dual metrics provide direct operational signals beyond primal decision variable values:Python# Retrieve shadow prices (dual variables) across constraints pi_vals = m.getAttr(‘Pi’, m.getConstrs())</p>
-</section>
-<section id="retrieve-reduced-costs-across-decision-variables" class="level1">
-<h1>Retrieve reduced costs across decision variables</h1>
-<p>rc_vals = m.getAttr(‘RC’, m.getVars()) By pairing solver backends with an IR-injection Harness engine, we establish a robust interface between probabilistic language models and deterministic mathematical solvers—enabling scalable RL training and dependable real-world deployments.</p>
 <section id="toward-multi-agent-collaboration-generalizing-the-harness-framework" class="level2">
 <h2 class="anchored" data-anchor-id="toward-multi-agent-collaboration-generalizing-the-harness-framework">Toward Multi-Agent Collaboration: Generalizing the Harness Framework</h2>
 <section id="a-general-multi-agent-framework" class="level3">
 <h3 class="anchored" data-anchor-id="a-general-multi-agent-framework">A General Multi-Agent Framework</h3>
 <p>Building upon our aforementioned Intermediate Representation (IR) Injection mechanism, the Harness framework’s capacity for optimization modeling can naturally extends to higher-level optimization task solving and can serve as the perfect foundation for a Multi-Agent System (MAS) tailored to to tackle complex, enterprise-grade operations research problems.</p>
-<p>Inspired by multi-agent optimization frameworks such as Optimus*<span class="citation" data-cites="chen2026solver">(<a href="#ref-chen2026solver" role="doc-biblioref">Chen et al. 2026</a>)</span>, we can we can construct a fully automated workflow designed for high-complexity optimization tasks. built around a clear pipeline: <strong>Problem Parsing <span class="math inline">\(\to\)</span> Code Generation <span class="math inline">\(\to\)</span> Execution with Feedback <span class="math inline">\(\to\)</span> Diagnostic Remediation</strong>.</p>
+<p>Inspired by multi-agent optimization frameworks such as Optimus*<span class="citation" data-cites="ahmaditeshnizi2023optimus">(<a href="#ref-ahmaditeshnizi2023optimus" role="doc-biblioref">AhmadiTeshnizi et al. 2023</a>)</span>, we can we can construct a fully automated workflow designed for high-complexity optimization tasks. built around a clear pipeline: <strong>Problem Parsing <span class="math inline">\(\to\)</span> Code Generation <span class="math inline">\(\to\)</span> Execution with Feedback <span class="math inline">\(\to\)</span> Diagnostic Remediation</strong>.</p>
 <pre><code>[ Problem Description ]
           |
           v
@@ -584,7 +576,7 @@ Figure&nbsp;1: SIRL RLVR diagram
          |
          v
 +------------------+
-| Harness Engine   |  (Executes in sandbox, extracts logs &amp; metadata)
+| Harness Engine   |  (Rewrite and Executes in sandbox, extracts logs &amp; metadata)
 +--------+---------+
          |
          v
@@ -641,7 +633,7 @@ Figure&nbsp;1: SIRL RLVR diagram
 </section>
 <section id="harness-engineering-for-power-system-optimization" class="level3">
 <h3 class="anchored" data-anchor-id="harness-engineering-for-power-system-optimization">Harness Engineering for Power-System Optimization</h3>
-<p>To illustrate how our Harness-driven multi-agent architecture scales to complex vertical domains, we examine ProOPF*<a href="&quot;Benchmarking and Improving LLMs for Professional-Grade Power Systems Optimization Modeling&quot;">shen2026proopf</a> as a concrete case study. Power system optimization presents a uniquely demanding environment: tasks are strictly time-critical, tightly bound by physical laws, and historically dependent on the tacit, manual expertise of power engineers. With the powerfulness of semantic reasoning and formal code generation, LLMs agents can translate an power operator’s high-lvel requirements directly into executable matehmatical modeling and solver code paving a practical path toward end-to-end automated power system modeling.</p>
+<p>To illustrate how our Harness-driven multi-agent architecture scales to complex vertical domains, we examine ProOPF*<a href="&quot;Benchmarking and Improving LLMs for Professional-Grade Power Systems Optimization Modeling&quot;"><span class="citation" data-cites="shen2026proopf">Shen et al. (<span>2026</span>)</span></a> as a concrete case study. Power system optimization presents a uniquely demanding environment: tasks are strictly time-critical, tightly bound by physical laws, and historically dependent on the tacit, manual expertise of power engineers. With the powerfulness of semantic reasoning and formal code generation, LLMs agents can translate an power operator’s high-lvel requirements directly into executable matehmatical modeling and solver code paving a practical path toward end-to-end automated power system modeling.</p>
 <p>However, existing optimization benchmarks mostly target broad, cross-domain tasks and fall short of the strict standards required for industrial power systems. In real-world grid operations, “correct” code means much more than passing a syntax check or reaching a feasible status. Mission-critical workflows like Optimal Power Flow (OPF) must satisfy complex physical laws, operational bounds, and network topology constraints. ProOPF addresses this limitation by offering a specialized benchmark for professional-grade power system optimization. It provides a realistic testbed to measure whether LLMs can accurately translate intricate grid specifications into production-ready, executable optimization code. Specifically, ProOPF encapsulates a spectrum of benchmark power system optimization problems—including OPF, SCUC, and SCED—characterized by deeply nested constraint structures. Formulations in this domain must concurrently satisfy physical power-flow equations, discrete equipment status variables, hard operating limits, <span class="math inline">\(N-1\)</span> security criteria, and inter-temporal scheduling dynamics. This multi-faceted modeling friction positions ProOPF as an ideal benchmark for validating the proposed Harness framework</p>
 <p>Examining the mathematical taxonomy of these tasks demonstrates why standard LLM code generation falls short. The solver ecosystem for power grids is fundamentally heterogeneous. Rather than relying on a uniform compilation target, an intelligent LLM agent must dynamically route formulations based on their mathematical geometry and required execution loop:</p>
 <table class="caption-top table">
@@ -698,14 +690,19 @@ Figure&nbsp;1: SIRL RLVR diagram
 
 
 </section>
-</section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-ahmaditeshnizi2023optimus" class="csl-entry" role="listitem">
+AhmadiTeshnizi, Ali, Wenzhi Gao, and Madeleine Udell. 2023. <span>“Optimus: Optimization Modeling Using Mip Solvers and Large Language Models.”</span> <em>arXiv Preprint arXiv:2310.06116</em>.
+</div>
 <div id="ref-chen2026solver" class="csl-entry" role="listitem">
 Chen, Yitian, Jingfan Xia, Siyu Shao, Dongdong Ge, and Yinyu Ye. 2026. <span>“Solver-Informed RL: Grounding Large Language Models for Authentic Optimization Modeling.”</span> <em>Advances in Neural Information Processing Systems</em> 38: 106027–69.
 </div>
 <div id="ref-lopopolo2026harness" class="csl-entry" role="listitem">
 Lopopolo, R. 2026. <span>“Harness Engineering: Leveraging Codex in an Agent-First World.”</span> OpenAI Engineering Blog. <a href="https://openai.com/index/harness-engineering/">https://openai.com/index/harness-engineering/</a>.
+</div>
+<div id="ref-shen2026proopf" class="csl-entry" role="listitem">
+Shen, Chao, Zihan Guo, Xu Wan, et al. 2026. <span>“ProOPF: Benchmarking and Improving LLMs for Professional-Grade Power Systems Optimization Modeling.”</span> <em>arXiv Preprint arXiv:2602.03070</em>.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

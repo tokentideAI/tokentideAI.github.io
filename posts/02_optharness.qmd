@@ -1,7 +1,7 @@
 ---
 title: "Harness Engineering for Optimization Modeling: Strategy, Implementation, and Expansion"
 author: "Yitian Chen, Yanguang Chen, Siyu Shao"
-date: "2026-07-26"
+date: "2026-08-16"
 categories: [LLMs, Harness Engineering,Optimization Modeling]
 bibliography: 02_ref.bib   #
 draft: false
@@ -165,7 +165,7 @@ else:
 This rewrite-and-inject strategy cleanly decouples LLM generation from sandbox execution. By freeing the model from managing complex mathematical modeling and rigid output formatting simultaneously, IR Injection significantly enhances training efficiency, accelerates convergence, and improves evaluation robustness.
 As detailed in the original paper, the SIRL framework treats external solvers as verifiers within the RLVR paradigm. The pipeline proceeds in three steps: (1) the LLM generates a reasoning trace, a problem formulation, and executable solver code; (2) an IR injection engine intercepts and rewrites the generated scripts; (3) the engine then uses both the runtime execution logs and the resulting .lp model files to compute the final reward. The overall process is illustrated below:
 
-![SIRL RLVR diagram](../cytTechBlog/figs/optharness/diagram.jpg){#fig-example}
+![SIRL RLVR diagram](../figs/optharness/diagram.jpg){#fig-example}
 
 
 ### Unlocking Richer Feedback Signals: From Final results to Internal States
@@ -185,6 +185,7 @@ solve_time = m.Runtime
 # This allows us to detect if the LLM's formulation inadvertently caused a highly dense or ill-conditioned matrix
 A = m.getA()
 ```
+Here we retrieve the constraint matrix A as a scipy.sparse.csr_matrix, which iis Useful for evaluating sparse structure density and condition metrics.
 
    2. Root Cause Analysis (RCA) for Infeasibility:
 ```python
@@ -194,31 +195,18 @@ if m.Status == GRB.INFEASIBLE:
     # Precisely isolate the fragment of conflicting constraints for the LLM to debug
     m.write("conflict_model.ilp")
 ```
+When an LLM produces contradictory constraints, runtime error messages are often insufficient. We can instruct the solver to compute an Irreducible Inconsistent Subsystem (IIS) to isolate the conflict.
+
 
    3. Probe C: Economic Signals and Sensitivity Analysis:
 ```python
-if m.Status == GRB.INFEASIBLE:
-    # Compute the Irreducible Inconsistent Subsystem (IIS)
-    m.computeIIS()
-    # Precisely isolate the fragment of conflicting constraints for the LLM to debug
-    m.write("conflict_model.ilp")
+# Get shadow prices for all constraints
+pi_vals = m.getAttr('Pi', m.getConstrs())
+# Get reduced costs for all decision variables
+rc_vals = m.getAttr('RC', m.getVars())
 ```
 
-
-# Retrieve the constraint matrix A as a scipy.sparse.csr_matrix
-# Useful for evaluating sparse structure density and condition metrics
-A = m.getA()
-2. Infeasibility Root-Cause IsolationWhen an LLM produces contradictory constraints, runtime error messages are often insufficient. We can instruct the solver to compute an Irreducible Inconsistent Subsystem (IIS) to isolate the conflict:Pythonif m.Status == GRB.INFEASIBLE:
-    # Compute Irreducible Inconsistent Subsystem (IIS)
-    m.computeIIS() 
-    # Export minimal conflicting constraint subset for reflection
-    m.write("conflict_model.ilp")
-3. Sensitivity Analysis & Economic SignalsFor linear programming tasks, dual metrics provide direct operational signals beyond primal decision variable values:Python# Retrieve shadow prices (dual variables) across constraints
-pi_vals = m.getAttr('Pi', m.getConstrs())
-
-# Retrieve reduced costs across decision variables
-rc_vals = m.getAttr('RC', m.getVars())
-By pairing solver backends with an IR-injection Harness engine, we establish a robust interface between probabilistic language models and deterministic mathematical solvers—enabling scalable RL training and dependable real-world deployments.
+ Sensitivity Analysis & Economic SignalsFor linear programming tasks, dual metrics provide direct operational signals beyond primal decision variable value. By pairing solver backends with an IR-injection Harness engine, we establish a robust interface between probabilistic language models and deterministic mathematical solvers—enabling scalable RL training and dependable real-world deployments.
 
 
 ## Toward Multi-Agent Collaboration: Generalizing the Harness Framework
@@ -229,7 +217,7 @@ the Harness framework’s capacity for optimization modeling
 can naturally extends to higher-level optimization task solving and can 
 serve as the perfect foundation for a Multi-Agent System (MAS) tailored to to tackle complex, enterprise-grade operations research problems.
 
-Inspired by multi-agent optimization frameworks such as Optimus*[@chen2026solver],
+Inspired by multi-agent optimization frameworks such as Optimus*[@ahmaditeshnizi2023optimus],
 we can we can construct a fully automated workflow designed for high-complexity optimization tasks.
  built around a clear pipeline: **Problem  Parsing $\to$ Code Generation $\to$ Execution with Feedback $\to$ Diagnostic Remediation**.
 
@@ -248,7 +236,7 @@ we can we can construct a fully automated workflow designed for high-complexity 
          |
          v
 +------------------+
-| Harness Engine   |  (Executes in sandbox, extracts logs & metadata)
+| Harness Engine   |  (Rewrite and Executes in sandbox, extracts logs & metadata)
 +--------+---------+
          |
          v
@@ -287,7 +275,7 @@ In this pipeline, the solver is no longer merely the execution backend of an LLM
 ### Harness Engineering for Power-System Optimization
 
 To illustrate how our Harness-driven multi-agent architecture scales to complex vertical domains, 
-we examine ProOPF*[shen2026proopf]("Benchmarking and Improving LLMs for Professional-Grade Power Systems Optimization Modeling") as a concrete case study. 
+we examine ProOPF*[@shen2026proopf]("Benchmarking and Improving LLMs for Professional-Grade Power Systems Optimization Modeling") as a concrete case study. 
 Power system optimization presents a uniquely demanding environment: tasks are strictly time-critical, tightly bound by physical laws, and historically dependent on the tacit, manual expertise of power engineers. 
 With the powerfulness of semantic reasoning and formal code generation, LLMs agents can translate an power operator's high-lvel requirements directly into executable matehmatical modeling and solver code paving a practical path toward end-to-end automated power system modeling.
 
