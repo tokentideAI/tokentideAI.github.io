@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Yitian Chen, Yanguang Chen, Siyu Shao">
+<meta name="dcterms.date" content="2026-07-26">
+
+<title>Harness Engineering for Optimization Modeling: Strategy, Implementation, and Expansion – TokenTide AI</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-0883b3f2169e153c5a396c0068902256.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-1d5a6e1eb4a0b3ea080dce93fb43051f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-0883b3f2169e153c5a396c0068902256.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-d1f7c28fd5283ca5a4b70c37ef98d8a8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-8008cc9fa29fea96039a2fe68f20525f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-d1f7c28fd5283ca5a4b70c37ef98d8a8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">TokenTide AI</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts/01_info_theory.html"> 
+<span class="menu-text">Post</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Harness Engineering for Optimization Modeling: Strategy, Implementation, and Expansion</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">LLMs</div>
+    <div class="quarto-category">Harness Engineering</div>
+    <div class="quarto-category">Optimization Modeling</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Yitian Chen, Yanguang Chen, Siyu Shao </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 26, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>The NeurIPS 2025 paper, <strong>Solver-Informed RL: Grounding Large Language Models for Authentic Optimization Modeling</strong> <span class="citation" data-cites="chen2026solver">(<a href="#ref-chen2026solver" role="doc-biblioref">Chen et al. 2026</a>)</span>, presents a pioneering approach to applying Reinforcement Learning with Verifiable Rewards (RLVR) to train LLMs for optimization tasks. Its core contribution is <strong>Solver-Informed Reinforcement Learning(SIRL)</strong>, a tailed RLVR framework that incorporates optimization solvers into the model-training loop.</p>
+<p>By interacting with external solvers such as Gurobi and COPT, the SIRL framework converts generated optimization code into concrete execution signals, including solver syntax status, infeasibility indicators, objective values, and decision-variable assignments. These signals are then transformed into structured and verifiable rewards. Instead of evaluating generated code solely on syntax or similarity to reference solutions, the framework assesses whether the resulting mathematical model is valid, feasible, and capable of producing the intended optimization solution. In this process, the solver acts as a strict and objective referee. Its feedback helps iteratively refine the LLM’s policy, directly aligning code generation with mathematical correctness and solver-verified performance. As a result, the model develops greater proficiency in formulating and solving authentic optimization problems.</p>
+<p>In this post, we look under the hood of the SIRL framework’s engineering backbone: a specialized harness designed for secure code execution and evaluation in LLM-driven optimization modeling. By routing generated code directly into sandboxed optimization solvers, this harness manages code re-expression, execution dispatch, and the critical translation of raw runtime outcomes into the multi-dimensional reward signals essential for the RLVR (Reinforcement Learning with Verifiable Rewards) training loop. Closing the loop between generation and execution empowers LLMs to safely test, evaluate, and iteratively refine their code against real solver dynamics. Ultimately, this framework for secure execution, solver integration, and failure handling is the missing link that allows Solver-Informed RL to graduate from clean academic testbeds to messy, highly constrained real-world business environments.</p>
+<section id="what-is-harness-engineering" class="level3">
+<h3 class="anchored" data-anchor-id="what-is-harness-engineering">What is Harness Engineering?</h3>
+<p>Following the paradigms of prompt engineering and context engineering, harness engineering has emerged as a new approach for building reliable AI systems. It gained widespread attention after the release of the OpenAI technical report &lt;&lt;Harness Engineering: Leveraging Codex in an Agent‑First World&gt;&gt; <span class="citation" data-cites="lopopolo2026harness">(<a href="#ref-lopopolo2026harness" role="doc-biblioref">Lopopolo 2026</a>)</span>.</p>
+<p>Because large language models are built on transformer architectures and autoregressive sampling, their outputs are inherently stochastic. Even the most capable models can give different answers to the same prompt, make inconsistent decisions, or fail unpredictably. Harness Engineering tackles this uncertainty by enveloping the model in a dedicated layer of software infrastructure and control logic. This layer governs how the model receives information, invokes tools, executes actions, validates outputs, handles failures, and incorporates feedback. Its purpose is to anchor a high-entropy generative engine into a controllable, verifiable, and closed-loop system. Through a meticulously designed execution harness, LLMs can be securely encapsulated and deployed into mission-critical business workflows that demand uncompromising stability and auditability.</p>
+<p>A simple way to express this idea is: <span class="math display">\[
+AI\text{-}Agent = \underbrace{\text{SOTA Model}}_{\text{the wild horse}}
++ \underbrace{\text{Harness}}_{\text{the control system}}.
+\]</span></p>
+<p>The harness determines whether that capability of current SOTA LLMs can be deployed safely, consistently, and effectively in the real world.</p>
+</section>
+</section>
+<section id="harness-framework-in-the-context-of-optimization-modeling" class="level2">
+<h2 class="anchored" data-anchor-id="harness-framework-in-the-context-of-optimization-modeling">Harness Framework in the Context of Optimization Modeling</h2>
+<p>In a standard Harness Engineering pipeline for code agents, execution is relatively straightforward: the LLM generates a standalone code snippet, which is then executed and validated through a tool call inside an isolated sandbox.</p>
+<p>Optimization solvers (such as Gurobi, COPT, or Google OR‑Tools) have a distinctive characteristic: they demand an object‑oriented workflow. You first initialize a core model instance, then programmatically attach decision variables, constraints, and the objective function, step by step. To see this pattern in action, consider a canonical textbook example—the tire transportation problem (strictly speaking, an integer linear programming problem):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>A company needs to transport at least <span class="dv">200</span> tires to meet demand. Two modes of transportation are available:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">*</span> Air Transport: Capacity of <span class="dv">10</span> tires per trip at a cost of $<span class="dv">1</span>,<span class="dv">000</span> per trip.</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">*</span> Truck Transport: Capacity of <span class="dv">6</span> tires per trip at a cost of $<span class="dv">700</span> per trip.</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>Constraints:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> Budget Cap: Total transportation cost cannot exceed $<span class="dv">22</span>,<span class="fl">000.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> Trip Ratio: The number of air trips cannot exceed the number of truck trips.</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> Demand Requirement: Total tires transported $\ge <span class="dv">200</span>$.</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>Objective: Determine the optimal number of air <span class="kw">and</span> truck trips to minimize the total number of trips <span class="cf">while</span> satisfying <span class="bu">all</span> constraints.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Below is a complete Gurobi script that prints both the optimal objective value and the decision variables.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gurobipy <span class="im">import</span> GRB</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> gp.Model()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> m.addVar(vtype<span class="op">=</span>GRB.INTEGER, name<span class="op">=</span><span class="st">"x"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> m.addVar(vtype<span class="op">=</span>GRB.INTEGER, name<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>m.setObjective(x <span class="op">+</span> y, GRB.MINIMIZE)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>m.addConstr(<span class="dv">10</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">6</span><span class="op">*</span>y <span class="op">&gt;=</span> <span class="dv">200</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>m.addConstr(<span class="dv">1000</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">700</span><span class="op">*</span>y <span class="op">&lt;=</span> <span class="dv">22000</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>m.addConstr(x <span class="op">&lt;=</span> y)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>m.optimize()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> m.status <span class="op">==</span> GRB.OPTIMAL:</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Just print the best obj: </span><span class="sc">{</span>m<span class="sc">.</span>objVal<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Just print the best sol: ["</span>, end<span class="op">=</span><span class="st">""</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> var <span class="kw">in</span> m.getVars():</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>var<span class="sc">.</span>X<span class="sc">}</span><span class="ss">"</span>, end<span class="op">=</span><span class="st">","</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"]"</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"No optimal solution found"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>However, when LLMs are used to generate such code snippets, whether through multi‑sample generation or RLVR training, each optimization task typically requires sampling multiple responses in parallel, with each response containing a candidate script (n‑rollouts, e.g., <span class="math inline">\(n=8\)</span> or <span class="math inline">\(n=16\)</span>). Due to the inherent stochasticity of LLMs, these scripts diverge wildly in how they format logs, name variables, and print optimization results, making automated extraction and parsing notoriously brittle.</p>
+<ol type="1">
+<li>Incomplete execution log: the code fails to print any information about the optimal value or decision variables (e.g., the script runs without errors but produces no output).</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> gurobipy <span class="im">as</span> gp</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gurobipy <span class="im">import</span> GRB</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> gp.Model()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> m.addVar(vtype<span class="op">=</span>GRB.INTEGER, name<span class="op">=</span><span class="st">"x"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> m.addVar(vtype<span class="op">=</span>GRB.INTEGER, name<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>m.setObjective(x <span class="op">+</span> y, GRB.MINIMIZE)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>m.addConstr(<span class="dv">10</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">6</span><span class="op">*</span>y <span class="op">&gt;=</span> <span class="dv">200</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>m.addConstr(<span class="dv">1000</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">700</span><span class="op">*</span>y <span class="op">&lt;=</span> <span class="dv">22000</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>m.addConstr(x <span class="op">&lt;=</span> y)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>m.optimize()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol start="2" type="1">
+<li>Partial execution log: the code produces incomplete output, printing only the objective function value (optimal value) while omitting the solution vector:</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> gurobipy <span class="im">as</span> gp</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gurobipy <span class="im">import</span> GRB</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> gp.Model()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> m.addVar(vtype<span class="op">=</span>GRB.INTEGER, name<span class="op">=</span><span class="st">"x"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> m.addVar(vtype<span class="op">=</span>GRB.INTEGER, name<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>m.setObjective(x <span class="op">+</span> y, GRB.MINIMIZE)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>m.addConstr(<span class="dv">10</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">6</span><span class="op">*</span>y <span class="op">&gt;=</span> <span class="dv">200</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>m.addConstr(<span class="dv">1000</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">700</span><span class="op">*</span>y <span class="op">&lt;=</span> <span class="dv">22000</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>m.addConstr(x <span class="op">&lt;=</span> y)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>m.optimize()</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> m.status <span class="op">==</span> GRB.OPTIMAL:</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"The optimal value = </span><span class="sc">{</span>m<span class="sc">.</span>objVal<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This output inconsistency poses a serious challenge for automated evaluation and reward calculation in RLVR training loops. To address it, the authors of SIRL introduced a lightweight Intermediate Representation (IR) Injection framework specifically designed for solver‑integrated optimization training.</p>
+<p>The core idea is straightforward: rather than relying on prompt engineering to force the LLM to output standardized print statements, the framework dynamically injects a standardized execution block for the generated code snippet. The core idea is simple: instead of relying on prompt engineering to force the LLM to emit standardized print statements, the framework dynamically injects a standardized execution block into the generated code. This augments the execution without imposing rigid formatting constraints on the model’s prompt or text generation. Specifically, the framework’s workflow consists of three key steps:</p>
+<ol type="1">
+<li>Dynamic instance Matching: Uses regular expressions to precisely capture the model object instance within the generated code. For example, based on standard solver syntax, the regex ()(+).(solve|optimize)() extracts the model instance name (e.g., <span class="math inline">\(m\)</span>), and the specific call method.</li>
+<li>Adaptive status‑check generation – Based on the target solver backend, the framework automatically generates the appropriate optimality check:
+<ul>
+<li>COPT solver → COPT.OPTIMAL</li>
+<li>Gurobi solver → GRB.OPTIMAL</li>
+</ul></li>
+<li>Forced injection / replacement – Once the model instance and solver action are identified, the harness automatically appends an additional code snippet that injects status verification and standardized output. This ensures the program reliably prints the Status, the Best Obj (optimal objective value), and the Best Sol (all decision variables).</li>
+</ol>
+<p>Consider the earlier incomplete Gurobi script, which lacked any output logic. When the injection framework detects m.optimize(), it automatically injects the output logic needed for downstream RLVR—printing the optimal objective value and the full solution vector. The transformation is shown below:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>... <span class="co"># initialization and modeling omitted</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>m.optimize()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After injection (modified in‑memory before sandbox execution):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ... # initialization and modeling omitted</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>m.optimize()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> m.status <span class="op">==</span> GRB.OPTIMAL:</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Just print the best obj: </span><span class="sc">{</span>m<span class="sc">.</span>objVal<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Just print the best sol: ["</span>, end<span class="op">=</span><span class="st">""</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> var <span class="kw">in</span> m.getVars():</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>var<span class="sc">.</span>X<span class="sc">}</span><span class="ss">"</span>, end<span class="op">=</span><span class="st">","</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"]"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"No optimal solution found"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This rewrite-and-inject strategy cleanly decouples LLM generation from sandbox execution. By freeing the model from managing complex mathematical modeling and rigid output formatting simultaneously, IR Injection significantly enhances training efficiency, accelerates convergence, and improves evaluation robustness. As detailed in the original paper, the SIRL framework treats external solvers as verifiers within the RLVR paradigm. The pipeline proceeds in three steps: (1) the LLM generates a reasoning trace, a problem formulation, and executable solver code; (2) an IR injection engine intercepts and rewrites the generated scripts; (3) the engine then uses both the runtime execution logs and the resulting .lp model files to compute the final reward. The overall process is illustrated below:</p>
+<div id="fig-example" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../cytTechBlog/figs/optharness/diagram.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: SIRL RLVR diagram
+</figcaption>
+</figure>
+</div>
+<section id="unlocking-richer-feedback-signals-from-final-results-to-internal-states" class="level3">
+<h3 class="anchored" data-anchor-id="unlocking-richer-feedback-signals-from-final-results-to-internal-states">Unlocking Richer Feedback Signals: From Final results to Internal States</h3>
+<p>By leveraging the Intermediate Representation (IR) Injection mechanism, the SIRL harness reliably standardizes solver outputs, effectively mitigating the variance inherent in LLM-generated formatting. Crucially, the utility of this harness extends well beyond parsing terminal results. By penetrating deeper into the solver’s execution stack, it exposes a wealth of metadata, intermediate search trajectories, and diagnostic telemetry to upper-layer RLVR pipelines and multi-agent frameworks.</p>
+<p>For complex industrial optimization applications, this deep observability is realized by dynamically embedding lightweight diagnostic hooks throughout the solver’s lifecycle. Rather than relying on sparse, binary success/failure signals, these hooks stream continuous data regarding intermediate optimization states, algorithmic bottlenecks, and structural mathematical traits. Equipped with this high-resolution feedback, LLMs gain the contextual depth necessary for multi-step reflection, precise root-cause diagnosis, and adaptive algorithmic tuning. Consequently, the model transitions from merely observing that a solution failed, to fundamentally understanding why a specific formulation or computational strategy succeeds, stalls, or collapses. Below, we detail representative diagnostic signals extractable via this framework. Here, We outline several representative diagnostic signals extracted via this framework below:</p>
+<ol type="1">
+<li>Profiling Execution Quality and Computational Latency:</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Capture solver runtime to benchmark the complexity of the generated model</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>solve_time <span class="op">=</span> m.Runtime</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the complete constraint matrix A (returns scipy.sparse.csr_matrix)</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># This allows us to detect if the LLM's formulation inadvertently caused a highly dense or ill-conditioned matrix</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> m.getA()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol start="2" type="1">
+<li>Root Cause Analysis (RCA) for Infeasibility:</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> m.Status <span class="op">==</span> GRB.INFEASIBLE:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the Irreducible Inconsistent Subsystem (IIS)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    m.computeIIS()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Precisely isolate the fragment of conflicting constraints for the LLM to debug</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    m.write(<span class="st">"conflict_model.ilp"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol start="3" type="1">
+<li>Probe C: Economic Signals and Sensitivity Analysis:</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> m.Status <span class="op">==</span> GRB.INFEASIBLE:</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the Irreducible Inconsistent Subsystem (IIS)</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    m.computeIIS()</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Precisely isolate the fragment of conflicting constraints for the LLM to debug</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    m.write(<span class="st">"conflict_model.ilp"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="retrieve-the-constraint-matrix-a-as-a-scipy.sparse.csr_matrix" class="level1">
+<h1>Retrieve the constraint matrix A as a scipy.sparse.csr_matrix</h1>
+</section>
+<section id="useful-for-evaluating-sparse-structure-density-and-condition-metrics" class="level1">
+<h1>Useful for evaluating sparse structure density and condition metrics</h1>
+<p>A = m.getA() 2. Infeasibility Root-Cause IsolationWhen an LLM produces contradictory constraints, runtime error messages are often insufficient. We can instruct the solver to compute an Irreducible Inconsistent Subsystem (IIS) to isolate the conflict:Pythonif m.Status == GRB.INFEASIBLE: # Compute Irreducible Inconsistent Subsystem (IIS) m.computeIIS() # Export minimal conflicting constraint subset for reflection m.write(“conflict_model.ilp”) 3. Sensitivity Analysis &amp; Economic SignalsFor linear programming tasks, dual metrics provide direct operational signals beyond primal decision variable values:Python# Retrieve shadow prices (dual variables) across constraints pi_vals = m.getAttr(‘Pi’, m.getConstrs())</p>
+</section>
+<section id="retrieve-reduced-costs-across-decision-variables" class="level1">
+<h1>Retrieve reduced costs across decision variables</h1>
+<p>rc_vals = m.getAttr(‘RC’, m.getVars()) By pairing solver backends with an IR-injection Harness engine, we establish a robust interface between probabilistic language models and deterministic mathematical solvers—enabling scalable RL training and dependable real-world deployments.</p>
+<section id="toward-multi-agent-collaboration-generalizing-the-harness-framework" class="level2">
+<h2 class="anchored" data-anchor-id="toward-multi-agent-collaboration-generalizing-the-harness-framework">Toward Multi-Agent Collaboration: Generalizing the Harness Framework</h2>
+<section id="a-general-multi-agent-framework" class="level3">
+<h3 class="anchored" data-anchor-id="a-general-multi-agent-framework">A General Multi-Agent Framework</h3>
+<p>Building upon our aforementioned Intermediate Representation (IR) Injection mechanism, the Harness framework’s capacity for optimization modeling can naturally extends to higher-level optimization task solving and can serve as the perfect foundation for a Multi-Agent System (MAS) tailored to to tackle complex, enterprise-grade operations research problems.</p>
+<p>Inspired by multi-agent optimization frameworks such as Optimus*<span class="citation" data-cites="chen2026solver">(<a href="#ref-chen2026solver" role="doc-biblioref">Chen et al. 2026</a>)</span>, we can we can construct a fully automated workflow designed for high-complexity optimization tasks. built around a clear pipeline: <strong>Problem Parsing <span class="math inline">\(\to\)</span> Code Generation <span class="math inline">\(\to\)</span> Execution with Feedback <span class="math inline">\(\to\)</span> Diagnostic Remediation</strong>.</p>
+<pre><code>[ Problem Description ]
+          |
+          v
++------------------+
+|  Agent A: Modeler|  (Extracts business domain boundaries &amp; math objectives)
++--------+---------+
+         |
+         v
++------------------+
+| Agent B: Solver  |  (Generates code + injects diagnostic hooks: IIS, duals)
++--------+---------+
+         |
+         v
++------------------+
+| Harness Engine   |  (Executes in sandbox, extracts logs &amp; metadata)
++--------+---------+
+         |
+         v
++------------------+
+|Agent C: Reflector|  (Diagnoses matrix ill-conditioning, IIS conflicts, dual gaps)
++--------+---------+
+         |
+         v
++------------------+
+| Agent D: Refiner |  (Relaxes constraints, adjusts bounds, resolves logic issues)
++------------------+
+</code></pre>
+<ul>
+<li><strong>Agent A (Business Modeler):</strong> Parses unstructured natural language to extract core business objectives, operational constraints, and domain assumptions.</li>
+<li><strong>Agent B (Optimization Solver):</strong> Translates specifications into code while leveraging the Harness to inject low-level diagnostic hooks (e.g., <code>model.computeIIS()</code>, dual variable extractors) for downstream observability.</li>
+<li><strong>Agent C (Reflection Expert):</strong> Analyzes execution logs, IIS output, and shadow prices returned from the sandbox, identifying underlying issues like numerical instability, contradictory constraints, or over-constrained formulations.</li>
+<li><strong>Agent D (Code Refiner):</strong> Applies targeted repairs based on Agent C’s diagnostics—relaxing tight bounds, updating penalty factors, or resolving logical conflicts—to complete the iteration cycle/loop.</li>
+</ul>
+<p>The key role of the Harness is to make the solver’s otherwise hidden internal states explicit, structured, and machine-readable. Through structured code injection and solver instrumentation, information such as execution traces, IIS results, dual variables, and performance statistics becomes directly accessible to the agents.</p>
+<p>This dramatically changes the optimization loop. Instead of relying on a coarse success/failure signal, agents can reason over detailed solver evidence and perform targeted revisions. The Harness therefore acts as an information engine that connects low-level solver execution with high-level agent reasoning.</p>
+<p>As LLM-based optimization modeling moves toward real industrial workloads, such an architecture becomes increasingly valuable. The same closed-loop design can be adapted to supply-chain planning, energy systems, portfolio optimization, transportation, manufacturing, and other domains where solving the mathematical program is only one component of the overall decision process.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 27%">
+<col style="width: 58%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Application</th>
+<th>Solver Signal Exposed by the Harness</th>
+<th>Adaptive Agent Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Power-System Unit Commitment</strong></td>
+<td>Dual information associated with operational or network constraints</td>
+<td>Identify economically stressed parts of the system and revise generation, reserve, or dispatch decisions accordingly</td>
+</tr>
+<tr class="even">
+<td><strong>Supply-Chain Network Optimization</strong></td>
+<td>IIS / conflicting constraint subsets</td>
+<td>Locate contradictory inventory, capacity, or service-level constraints and selectively convert hard requirements into penalized soft constraints</td>
+</tr>
+<tr class="odd">
+<td><strong>Portfolio Optimization</strong></td>
+<td>Shadow prices of capital, exposure, or risk constraints</td>
+<td>Estimate the marginal value of relaxing investment restrictions and adjust allocation limits across asset groups</td>
+</tr>
+</tbody>
+</table>
+<p>In this pipeline, the solver is no longer merely the execution backend of an LLM-generated program. It becomes an active participant in the reasoning loop, continuously producing structured signals that specialized agents can interpret, diagnose, and act upon.</p>
+</section>
+<section id="harness-engineering-for-power-system-optimization" class="level3">
+<h3 class="anchored" data-anchor-id="harness-engineering-for-power-system-optimization">Harness Engineering for Power-System Optimization</h3>
+<p>To illustrate how our Harness-driven multi-agent architecture scales to complex vertical domains, we examine ProOPF*<a href="&quot;Benchmarking and Improving LLMs for Professional-Grade Power Systems Optimization Modeling&quot;">shen2026proopf</a> as a concrete case study. Power system optimization presents a uniquely demanding environment: tasks are strictly time-critical, tightly bound by physical laws, and historically dependent on the tacit, manual expertise of power engineers. With the powerfulness of semantic reasoning and formal code generation, LLMs agents can translate an power operator’s high-lvel requirements directly into executable matehmatical modeling and solver code paving a practical path toward end-to-end automated power system modeling.</p>
+<p>However, existing optimization benchmarks mostly target broad, cross-domain tasks and fall short of the strict standards required for industrial power systems. In real-world grid operations, “correct” code means much more than passing a syntax check or reaching a feasible status. Mission-critical workflows like Optimal Power Flow (OPF) must satisfy complex physical laws, operational bounds, and network topology constraints. ProOPF addresses this limitation by offering a specialized benchmark for professional-grade power system optimization. It provides a realistic testbed to measure whether LLMs can accurately translate intricate grid specifications into production-ready, executable optimization code. Specifically, ProOPF encapsulates a spectrum of benchmark power system optimization problems—including OPF, SCUC, and SCED—characterized by deeply nested constraint structures. Formulations in this domain must concurrently satisfy physical power-flow equations, discrete equipment status variables, hard operating limits, <span class="math inline">\(N-1\)</span> security criteria, and inter-temporal scheduling dynamics. This multi-faceted modeling friction positions ProOPF as an ideal benchmark for validating the proposed Harness framework</p>
+<p>Examining the mathematical taxonomy of these tasks demonstrates why standard LLM code generation falls short. The solver ecosystem for power grids is fundamentally heterogeneous. Rather than relying on a uniform compilation target, an intelligent LLM agent must dynamically route formulations based on their mathematical geometry and required execution loop:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Grid Problem</th>
+<th>Mathematical Formulation</th>
+<th>Typical Solver / Execution Pathway</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>AC-OPF</strong></td>
+<td>Non-convex NLP</td>
+<td>MATPOWER MIPS / IPOPT / KNITRO</td>
+</tr>
+<tr class="even">
+<td><strong>DC-OPF &amp; SCED</strong></td>
+<td>LP / QP</td>
+<td>Gurobi / COPT / CPLEX</td>
+</tr>
+<tr class="odd">
+<td><strong>SCUC</strong></td>
+<td>MILP</td>
+<td>Branch-and-Bound + Cutting Planes</td>
+</tr>
+<tr class="even">
+<td><strong>SCOPF (<span class="math inline">\(N-1\)</span>)</strong></td>
+<td>Security-Constrained Extension</td>
+<td>Iterative Contingency Screening + Master Problem Re-solving</td>
+</tr>
+</tbody>
+</table>
+<p>In this domain, both human experts and LLM-driven agents confront a fundamental bottleneck: superficial algorithmic convergence. Even when the generated code is syntactically pristine and the solver achieves optimality, the underlying formulation may entirely lack engineering fidelity. Subtle errors—such as topological index misalignments, inconsistent load units, the omission of critical <span class="math inline">\(N-1\)</span> security scenarios, or redundant reserve constraints—are insidious because they fail silently. Rather than throwing explicit exceptions, they quietly distort the feasible region, yielding solutions that are mathematically optimal yet physically invalid.To counter this, our IR Injection harness framework fundamentally alters the evaluation paradigm. By employing a “rewrite-and-inject” methodology, we elevate the modeling and optimization process from a black box into a fully executable, diagnosable, and replayable trajectory. This injection mechanism allows us to harvest a series of structured, intermediate execution byproducts. It is crucial to emphasize that the exact type of diagnostic byproduct extracted is inherently coupled to the mathematical structure of the problem:</p>
+<ul>
+<li><strong>LP / MILP Stack (DC-OPF, SCED, SCUC):</strong> Exports standardized <code>.lp</code> and <code>.mps</code> snapshots for structural constraint diffing; generates <code>conflict.ilp</code> to pinpoint constraint contradictions; parses <code>solver.log</code> for presolve reduction ratios, root-node relaxations, and MIP gaps.</li>
+<li><strong>Non-Convex NLP Stack (AC-OPF):</strong> Tracks KKT first-order optimality residuals, complementarity slackness violations, non-linear convergence trajectories, exit flags (e.g., local optima vs.&nbsp;unbounded step-length pull-backs), and feasibility recovery distributions.</li>
+<li><strong>Shared Output Layer:</strong> Emits a normalized <code>solution.json</code> containing primal-dual solution vectors, operational constraint violation tables (e.g., branch MVA flows against <code>RATE_A</code>, bus voltage bounds <span class="math inline">\([V_{\min}, V_{\max}]\)</span>), and runtime telemetry.</li>
+</ul>
+<p>We engineered a streamlined multi-agent system where distinct agents handle generation, verification, error-correction, and policy switching. The key innovation lies in using our harness framework to pipe structured intermediate data across the system, establishing a single source of ‘shared facts’ for seamless agent collaboration. The benchmark results speak for themselves: in intricate power grid optimization tasks, our framework massively eclipses current closed-source SOTA models, proving the robustness and transformative potential of the Harness framework in real-world power optimization.</p>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>In this article, we detailed the foundational Harness framework underlying the SIRL paper. SIRL stands as a pioneering effort in applying Reinforcement Learning with Verifiable Rewards (RLVR) to the domain of optimization modeling. Tailored specifically for the idiosyncrasies of optimization formulation and solver syntax, this Harness strategy forms the indispensable engineering backbone of SIRL’s RLVR pipeline. It supplies a robust execution environment and a dense stream of verifiable reward signals, directly empowering the model’s advanced reasoning and decision-making.</p>
+<p>Concurrently, we explored the generalization of this Harness framework to broader multi-agent synergistic systems and specialized vertical domains, such as power system optimization, projecting its utility for next-generation optimization agents. As optimization modeling penetrates deeper into real-world industrial applications, this architecture will assume an increasingly critical role. Notably, this Harness infrastructure was conceptualized and matured long before “Harness engineering” emerged as a mainstream AI trend, demonstrating a precise grasp of the core engineering prerequisites for automated mathematical modeling.</p>
+<p>We invite interested researchers and industry practitioners to review our open-source code and model weights via GitHub. For technical discussions or inquiries, please leave a comment or contact the team with the email chenyitian@tokentide.cn.</p>
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-chen2026solver" class="csl-entry" role="listitem">
+Chen, Yitian, Jingfan Xia, Siyu Shao, Dongdong Ge, and Yinyu Ye. 2026. <span>“Solver-Informed RL: Grounding Large Language Models for Authentic Optimization Modeling.”</span> <em>Advances in Neural Information Processing Systems</em> 38: 106027–69.
+</div>
+<div id="ref-lopopolo2026harness" class="csl-entry" role="listitem">
+Lopopolo, R. 2026. <span>“Harness Engineering: Leveraging Codex in an Agent-First World.”</span> OpenAI Engineering Blog. <a href="https://openai.com/index/harness-engineering/">https://openai.com/index/harness-engineering/</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tokenTideAI\.github\.io\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Yitian Chen</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Powered by Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

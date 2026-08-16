@@ -2,6 +2,8 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/02_optharness.html",
+      "/posts/03_optengine.html",
       "/posts/01_info_theory.html"
     ]
   }
