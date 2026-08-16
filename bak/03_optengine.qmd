@@ -3,7 +3,7 @@ title: "OPT-Engine: Benchmarking the Limits of LLMs in Optimization Modeling via
 author: "Yitian Chen, Cheng Cheng, Yinan Sun, Zi Ling, Dongdong Ge"
 date: "2026-07-23"
 categories: [LLMs, Optimization Modeling]
-bibliography: 03_ref.bib   # 指定你
+bibliography: 03_ref.bib   #
 draft: true
 ---
 
